@@ -28,13 +28,23 @@ if [ ! -f "$DEV" ]; then
   echo "נשמר ✓"
 fi
 
+# אם הרצה קודמת עדיין פתוחה – סוגרים אותה
+pkill -f "wrangler@4 dev --port 8787" 2>/dev/null; pkill -f "workerd" 2>/dev/null
+pkill -f "http.server 8080" 2>/dev/null
+sleep 1
+
 # שרת האתר
 python3 -m http.server 8080 --bind 127.0.0.1 >/dev/null 2>&1 &
 SITE_PID=$!
 # שרת הניהול (מקומי)
 ( cd admin-api && npx --yes wrangler@4 dev --port 8787 --ip 127.0.0.1 >/tmp/formal-admin-dev.log 2>&1 ) &
 API_PID=$!
-cleanup() { kill $SITE_PID $API_PID 2>/dev/null; pkill -P $API_PID 2>/dev/null; echo; echo "נסגר."; exit 0; }
+cleanup() {
+  kill $SITE_PID 2>/dev/null
+  pkill -f "wrangler@4 dev --port 8787" 2>/dev/null; pkill -f "workerd" 2>/dev/null
+  kill $API_PID 2>/dev/null
+  echo; echo "נסגר."; exit 0
+}
 trap cleanup INT TERM
 
 echo "ממתינה לשרת הניהול (פעם ראשונה עשויה לקחת כדקה)..."
