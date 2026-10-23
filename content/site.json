@@ -42,6 +42,6 @@
     "עיצוב",
     "וידאו"
   ],
-  "adminApi": "",
+  "adminApi": "https://formal-admin.formal-action.workers.dev",
   "showSourceLink": false
 }
