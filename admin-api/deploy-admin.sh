@@ -38,7 +38,17 @@ fi
 
 # 3) פריסה ראשונה (הסודות מוגדרים אחר כך ונכנסים לתוקף מיד)
 echo "מפרסמת את השרת..."
-OUT="$($W deploy 2>&1)" || { echo "$OUT"; exit 1; }
+OUT="$($W deploy 2>&1)"
+if printf '%s' "$OUT" | grep -q "workers.dev subdomain"; then
+  # לחשבון חדש אין עדיין תת-דומיין. מריצים את הפריסה באופן אינטראקטיבי כדי שתוכלי לאשר ולבחור שם.
+  echo
+  echo "=== Cloudflare מבקש לבחור שם לתת-הדומיין של החשבון (פעם אחת) ==="
+  echo "בשאלה 'register a workers.dev subdomain now?' – לחצי Y ואז Enter."
+  echo "בשאלה על השם – אפשר להשאיר את ההצעה או לכתוב למשל: formal"
+  echo
+  $W deploy || { echo "הפריסה נכשלה"; exit 1; }
+  OUT="$($W deploy 2>&1)"
+fi
 API_URL="$(printf '%s' "$OUT" | grep -oE 'https://[a-z0-9.-]+\.workers\.dev' | head -1)"
 [ -n "$API_URL" ] || { echo "$OUT"; echo "לא נמצאה כתובת ה-Worker בפלט"; exit 1; }
 echo "שרת ✓ $API_URL"

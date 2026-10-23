@@ -18,7 +18,7 @@ MAX_UPLOAD_MB = "20"
 
 [[kv_namespaces]]
 binding = "ADMIN_KV"
-id = "KV_ID_PLACEHOLDER"
+id = "40fdbbe39fde4b34ac8a499a643ef911"
 
 # Secrets (לא בקובץ הזה! מוגדרים עם wrangler secret put):
 #   GITHUB_TOKEN     – טוקן גיטהאב עם הרשאת כתיבה לריפו formal
