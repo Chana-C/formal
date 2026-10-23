@@ -19,6 +19,7 @@
     "category": "branding",
     "type": "image",
     "src": "assets/img/posters/p02.svg",
+    "poster": "",
     "featured": true,
     "description": "שפה חזותית מלאה לרשת בתי קפה: לוגו, אריזות, שילוט ותפריטים."
   },
@@ -42,6 +43,7 @@
     "category": "print",
     "type": "image",
     "src": "assets/img/posters/p04.svg",
+    "poster": "",
     "featured": true,
     "description": "סדרת פוסטרים לפסטיבל, הדפסה בפורמט רחב ושילוט חוצות."
   },
@@ -54,6 +56,7 @@
     "type": "youtube",
     "src": "https://www.youtube.com/watch?v=R6MlUcmOul8",
     "poster": "assets/img/posters/p05.svg",
+    "featured": false,
     "description": "ריל שנתי – אוסף העבודות הנבחרות של הסטודיו."
   },
   {
@@ -64,6 +67,8 @@
     "category": "branding",
     "type": "image",
     "src": "assets/img/posters/p06.svg",
+    "poster": "",
+    "featured": false,
     "description": "אריזות מינימליסטיות לסדרת טיפוח. שחור, לבן ונגיעת אדום."
   },
   {
@@ -74,6 +79,8 @@
     "category": "digital",
     "type": "image",
     "src": "assets/img/posters/p07.svg",
+    "poster": "",
+    "featured": false,
     "description": "סט באנרים, סטוריז וריל לרשתות החברתיות."
   },
   {
@@ -85,6 +92,7 @@
     "type": "youtube",
     "src": "https://www.youtube.com/watch?v=TLkA0RELQ1g",
     "poster": "assets/img/posters/p08.svg",
+    "featured": false,
     "description": "הפקה מלאה של ערב גאלה: עיצוב במה, תאורה, מיתוג האירוע וסרטון סיכום."
   },
   {
@@ -95,6 +103,8 @@
     "category": "print",
     "type": "image",
     "src": "assets/img/posters/p09.svg",
+    "poster": "",
+    "featured": false,
     "description": "ספר מותג 120 עמודים, עיצוב וטיפוגרפיה."
   }
 ]
