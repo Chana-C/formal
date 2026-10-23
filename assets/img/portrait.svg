@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+
+<defs>
+  <filter id="grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.09 0"/>
+  </filter>
+  <filter id="blur60"><feGaussianBlur stdDeviation="60"/></filter>
+  <filter id="blur120"><feGaussianBlur stdDeviation="120"/></filter>
+  <radialGradient id="redglow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#e10600" stop-opacity="0.9"/><stop offset="1" stop-color="#e10600" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="whiteglow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="vig" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#000" stop-opacity="0.35"/><stop offset="0.5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.6"/>
+  </linearGradient>
+</defs>
+<rect width="800" height="1000" fill="#0c0c0c"/>
+<ellipse cx="650" cy="150" rx="420" ry="380" fill="url(#redglow)" filter="url(#blur120)" opacity="0.75"/>
+<ellipse cx="80" cy="300" rx="300" ry="420" fill="url(#whiteglow)" filter="url(#blur120)" opacity="0.5"/>
+<!-- silhouette -->
+<ellipse cx="400" cy="420" rx="150" ry="190" fill="#060606"/>
+<path d="M120 1000 C 140 760, 300 650, 400 650 C 500 650, 660 760, 680 1000 Z" fill="#060606"/>
+<!-- rim light -->
+<path d="M540 330 C 575 400, 570 520, 505 590" fill="none" stroke="#e10600" stroke-width="7" stroke-linecap="round" opacity="0.9"/>
+<path d="M265 330 C 235 400, 240 520, 300 590" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+<path d="M640 800 C 660 860, 672 930, 678 1000" fill="none" stroke="#e10600" stroke-width="6" stroke-linecap="round" opacity="0.8"/>
+<rect width="800" height="1000" fill="url(#vig)"/>
+<rect width="800" height="1000" filter="url(#grain)"/>
+</svg>

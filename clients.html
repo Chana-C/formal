@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>לקוחות · FORMAL</title>
+  <meta name="description" content="מה לקוחות אומרים על העבודה עם FORMAL – המלצות, ציטוטים והמלצות וידאו.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" href="assets/img/logo-icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/logo-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">דלג לתוכן</a>
+  <div class="curtain is-boot" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo" href="index.html" aria-label="FORMAL – דף הבית"><img class="logo__img" src="assets/img/logo.png" alt="FORMAL" draggable="false"></a>
+      <button class="burger" aria-label="תפריט" aria-expanded="false"><span></span><span></span><span></span></button>
+      <nav class="nav" aria-label="ניווט ראשי">
+        <a class="nav__link" href="index.html">בית</a>
+        <a class="nav__link" href="works.html">עבודות</a>
+        <a class="nav__link" href="about.html">אודות</a>
+        <a class="nav__link" href="clients.html">לקוחות</a>
+        <a class="btn btn--red nav__cta" href="index.html#contact">בואו נדבר</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="page-hero">
+      <div class="page-hero__bg" aria-hidden="true"></div>
+      <div class="container">
+        <p class="eyebrow reveal">מילים של לקוחות</p>
+        <h1 class="page-hero__title reveal" style="--d:0.05s">מה <em>אומרים</em><br>אחרי האקשן</h1>
+        <p class="lead page-hero__lead reveal" style="--d:0.1s">ציטוטים, סיפורים והמלצות וידאו מאנשים שעבדנו יחד.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <span class="side-label" aria-hidden="true">TESTIMONIALS</span>
+      <div class="container">
+        <div class="testimonials" data-testimonials></div>
+      </div>
+    </section>
+
+    <section class="section section--line">
+      <div class="container">
+        <div class="section__head reveal" style="justify-content:center;text-align:center">
+          <div>
+            <p class="eyebrow" style="justify-content:center">קרדיטים</p>
+            <h2 class="section__title">עבדנו <em>יחד</em></h2>
+          </div>
+        </div>
+        <div class="credits reveal reveal--fade" data-credits aria-label="רשימת לקוחות"></div>
+      </div>
+    </section>
+
+    <section class="cta section--line">
+      <div class="cta__glow" aria-hidden="true"></div>
+      <div class="container reveal">
+        <h2 class="cta__title">הציטוט הבא <em>שלכם</em></h2>
+        <p class="cta__text">בואו נעשה משהו שתרצו לדבר עליו.</p>
+        <a class="btn btn--white" href="index.html#form">בואו נדבר</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__bottom" style="margin-top:0;border-top:0;padding-top:0">
+        <span class="logo"><img class="logo__img" src="assets/img/logo.png" alt="FORMAL" draggable="false"></span>
+        <span>© <span data-year></span> <span data-site="owner.name"></span> · <span data-site="owner.role"></span>. כל הזכויות שמורות.</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog">
+      <button class="modal__close" type="button" data-close><kbd>ESC</kbd> סגירה</button>
+      <div class="modal__media protected"></div>
+      <div class="modal__info">
+        <div>
+          <h3 class="modal__title" id="modal-title"></h3>
+          <p class="modal__sub"></p>
+          <p class="modal__desc"></p>
+        </div>
+        <div class="modal__nav">
+          <button class="modal__btn" type="button" data-prev aria-label="הקודם"></button>
+          <button class="modal__btn" type="button" data-next aria-label="הבא"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="content/site.js"></script>
+  <script src="content/works.js"></script>
+  <script src="content/testimonials.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

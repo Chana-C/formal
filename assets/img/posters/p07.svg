@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+
+<defs>
+  <filter id="grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.09 0"/>
+  </filter>
+  <filter id="blur60"><feGaussianBlur stdDeviation="60"/></filter>
+  <filter id="blur120"><feGaussianBlur stdDeviation="120"/></filter>
+  <radialGradient id="redglow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#e10600" stop-opacity="0.9"/><stop offset="1" stop-color="#e10600" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="whiteglow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="vig" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#000" stop-opacity="0.35"/><stop offset="0.5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.6"/>
+  </linearGradient>
+</defs>
+<rect width="1600" height="1000" fill="#0a0a0a"/>
+
+    <circle cx="1300" cy="800" r="600" fill="url(#redglow)" filter="url(#blur120)" opacity="0.55"/>
+    <polyline fill="none" stroke="#f2f2f2" stroke-width="3" opacity="0.5" points="0,500 40,533.8785484037021 80,555.9223451580335 120,558.4308578526917 160,540.527790833069 200,508.467200483592 240,473.44877340230886 280,447.7054536551847 320,440.23012346984956 360,453.6341307466407 400,483.23507010806446 440,518.6924818108026 480,547.6200718309492 520,559.9126007224763 560,551.2759344852968 600,524.7271091145054 640,489.5403931266212 680,458.0075187443875 720,441.14382619601054 760,444.84028846011944 800,467.8056249199739 840,502.0173828332682 880,535.5244108824334 920,556.6217401666463 960,557.9394665929567 1000,539.017270409427 1040,506.46521913796664 1080,471.654680816092 1120,446.74597798510973 1160,440.440437171762 1200,454.9407651936994 1240,485.1815802958025 1280,520.5988957291937 1320,548.8204242504263 1360,559.9875740085602 1400,550.1993383121634 1440,522.8750294992966 1480,487.5598147635945 1520,456.5903146373453 1560,440.7850665127611 1600,445.66529827960255"/>
+    <polyline fill="none" stroke="#e10600" stroke-width="10" stroke-linejoin="round" points="0,500 500,500 560,300 620,700 680,420 740,560 800,500 1600,500"/>
+    <rect x="60" y="760" width="30" height="20" fill="#f2f2f2" opacity="0.2"/><rect x="122" y="730" width="30" height="50" fill="#f2f2f2" opacity="0.35"/><rect x="184" y="700" width="30" height="80" fill="#f2f2f2" opacity="0.5"/><rect x="246" y="670" width="30" height="110" fill="#f2f2f2" opacity="0.6499999999999999"/><rect x="308" y="640" width="30" height="140" fill="#f2f2f2" opacity="0.8"/><rect x="370" y="760" width="30" height="20" fill="#f2f2f2" opacity="0.2"/><rect x="432" y="730" width="30" height="50" fill="#f2f2f2" opacity="0.35"/><rect x="494" y="700" width="30" height="80" fill="#f2f2f2" opacity="0.5"/><rect x="556" y="670" width="30" height="110" fill="#f2f2f2" opacity="0.6499999999999999"/><rect x="618" y="640" width="30" height="140" fill="#f2f2f2" opacity="0.8"/><rect x="680" y="760" width="30" height="20" fill="#f2f2f2" opacity="0.2"/><rect x="742" y="730" width="30" height="50" fill="#f2f2f2" opacity="0.35"/><rect x="804" y="700" width="30" height="80" fill="#f2f2f2" opacity="0.5"/><rect x="866" y="670" width="30" height="110" fill="#f2f2f2" opacity="0.6499999999999999"/><rect x="928" y="640" width="30" height="140" fill="#f2f2f2" opacity="0.8"/><rect x="990" y="760" width="30" height="20" fill="#f2f2f2" opacity="0.2"/><rect x="1052" y="730" width="30" height="50" fill="#f2f2f2" opacity="0.35"/><rect x="1114" y="700" width="30" height="80" fill="#f2f2f2" opacity="0.5"/><rect x="1176" y="670" width="30" height="110" fill="#f2f2f2" opacity="0.6499999999999999"/><rect x="1238" y="640" width="30" height="140" fill="#f2f2f2" opacity="0.8"/><rect x="1300" y="760" width="30" height="20" fill="#f2f2f2" opacity="0.2"/><rect x="1362" y="730" width="30" height="50" fill="#f2f2f2" opacity="0.35"/><rect x="1424" y="700" width="30" height="80" fill="#f2f2f2" opacity="0.5"/><rect x="1486" y="670" width="30" height="110" fill="#f2f2f2" opacity="0.6499999999999999"/>
+    <text x="120" y="200" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="110" fill="#f2f2f2" text-anchor="start" letter-spacing="27.5" >PULSE</text>
+    <text x="120" y="250" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="22" fill="#e10600" text-anchor="start" letter-spacing="5.5" >DIGITAL CAMPAIGN</text>
+  
+<rect width="1600" height="1000" fill="url(#vig)"/>
+<rect width="1600" height="1000" filter="url(#grain)" opacity="0.9"/>
+</svg>

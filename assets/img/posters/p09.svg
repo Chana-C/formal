@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+
+<defs>
+  <filter id="grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.09 0"/>
+  </filter>
+  <filter id="blur60"><feGaussianBlur stdDeviation="60"/></filter>
+  <filter id="blur120"><feGaussianBlur stdDeviation="120"/></filter>
+  <radialGradient id="redglow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#e10600" stop-opacity="0.9"/><stop offset="1" stop-color="#e10600" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="whiteglow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="vig" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#000" stop-opacity="0.35"/><stop offset="0.5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.6"/>
+  </linearGradient>
+</defs>
+<rect width="1600" height="1000" fill="#0a0a0a"/>
+
+    <circle cx="200" cy="900" r="500" fill="url(#redglow)" filter="url(#blur120)" opacity="0.45"/>
+    <rect x="360" y="250" width="420" height="520" fill="#171717" stroke="#fff" stroke-opacity="0.3"/>
+    <rect x="800" y="250" width="420" height="520" fill="#f2f2f2"/>
+    <rect x="400" y="300" width="340" height="12" fill="#e10600"/>
+    <rect x="400" y="340" width="200" height="4" fill="#fff" opacity="0.35"/><rect x="400" y="376" width="253" height="4" fill="#fff" opacity="0.35"/><rect x="400" y="412" width="306" height="4" fill="#fff" opacity="0.35"/><rect x="400" y="448" width="219" height="4" fill="#fff" opacity="0.35"/><rect x="400" y="484" width="272" height="4" fill="#fff" opacity="0.35"/><rect x="400" y="520" width="325" height="4" fill="#fff" opacity="0.35"/><rect x="400" y="556" width="238" height="4" fill="#fff" opacity="0.35"/><rect x="400" y="592" width="291" height="4" fill="#fff" opacity="0.35"/><rect x="400" y="628" width="204" height="4" fill="#fff" opacity="0.35"/><rect x="400" y="664" width="257" height="4" fill="#fff" opacity="0.35"/>
+    <circle cx="1010" cy="480" r="110" fill="#e10600"/>
+    <text x="1010" y="700" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="44" fill="#0a0a0a" text-anchor="middle" letter-spacing="11" >ATELIER</text>
+    <text x="800" y="900" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="22" fill="#f2f2f2" text-anchor="middle" letter-spacing="5.5" >BRAND BOOK · 120 PAGES</text>
+  
+<rect width="1600" height="1000" fill="url(#vig)"/>
+<rect width="1600" height="1000" filter="url(#grain)" opacity="0.9"/>
+</svg>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>מחולל פריטים · FORMAL</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/img/logo-icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/logo-icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700;900&family=Heebo:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .tool { padding: 120px 0 80px; }
+    .tool__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+    @media (max-width: 900px) { .tool__grid { grid-template-columns: 1fr; } }
+    .tool label { display: grid; gap: 6px; font-size: 0.9rem; color: var(--fg-dim); }
+    .tool select { width: 100%; padding: 14px 16px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 4px; color: var(--fg); font: inherit; }
+    .tool .check { display: flex; align-items: center; gap: 10px; }
+    .tool .check input { width: 18px; height: 18px; accent-color: var(--red); }
+    .code { position: relative; background: #000; border: 1px solid var(--line); border-radius: 4px; padding: 20px; direction: ltr; text-align: left; font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.6; white-space: pre-wrap; word-break: break-all; color: #d9d9d9; min-height: 200px; }
+    .code .k { color: #ff6b63; } .code .s { color: #f2f2f2; }
+    .copy { position: absolute; top: 12px; right: 12px; }
+    .steps { display: grid; gap: 10px; color: var(--fg-dim); font-size: 0.95rem; counter-reset: s; }
+    .steps li { counter-increment: s; display: grid; grid-template-columns: 28px 1fr; gap: 10px; }
+    .steps li::before { content: counter(s, decimal-leading-zero); font-family: var(--font-mono); color: var(--red); font-size: 0.75rem; padding-top: 5px; }
+    .steps a { color: var(--fg); border-bottom: 1px solid var(--red); }
+    .preview { margin-top: 20px; aspect-ratio: 16/9; background: #000; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; position: relative; }
+    .preview iframe, .preview img, .preview video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: contain; }
+    .ok { color: #7ee787; } .bad { color: var(--red-2); }
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    @media (max-width: 860px) { .nav { position: static; opacity: 1; visibility: visible; flex-direction: row; background: none; backdrop-filter: none; } .nav__link { font-family: var(--font-body); font-weight: 400; font-size: 1rem; opacity: 1; transform: none; } }
+    .out-wrap { position: relative; }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <header class="header is-scrolled">
+    <div class="container header__inner">
+      <a class="logo" href="index.html"><img class="logo__img" src="assets/img/logo.png" alt="FORMAL" draggable="false"></a>
+      <nav class="nav"><a class="nav__link" href="index.html">חזרה לאתר</a></nav>
+    </div>
+  </header>
+
+  <main class="tool">
+    <div class="container">
+      <p class="eyebrow">כלי עזר · לא מופיע בתפריט האתר</p>
+      <h1 class="section__title" style="margin-bottom:12px">מחולל <em>פריטים</em></h1>
+      <p class="lead" style="margin-bottom:40px">ממלאים את הטופס, מעתיקים את הקוד שנוצר, ומדביקים אותו בקובץ המתאים בתיקייה <b>content</b>. זה הכול.</p>
+
+      <div class="tabs">
+        <button class="filter is-active" data-tab="work" type="button">עבודה (וידאו / תמונה)</button>
+        <button class="filter" data-tab="testimonial" type="button">המלצת לקוח</button>
+      </div>
+
+      <div class="tool__grid">
+        <!-- ====== WORK FORM ====== -->
+        <form class="form" id="form-work">
+          <label>סוג
+            <select name="type">
+              <option value="auto">זיהוי אוטומטי לפי הקישור</option>
+              <option value="youtube">YouTube</option>
+              <option value="drive">Google Drive (וידאו)</option>
+              <option value="vimeo">Vimeo</option>
+              <option value="file">קובץ וידאו שהעליתי לתיקייה assets/media</option>
+              <option value="image">תמונה</option>
+            </select>
+          </label>
+          <label>קישור / נתיב <input name="src" placeholder="https://www.youtube.com/watch?v=... או assets/media/photo.jpg" dir="ltr" required></label>
+          <div class="form__row">
+            <label>שם העבודה <input name="title" placeholder="קמפיין השקה · Noir" required></label>
+            <label>מזהה באנגלית (ייחודי) <input name="id" placeholder="noir-launch" dir="ltr" required></label>
+          </div>
+          <div class="form__row">
+            <label>לקוח <input name="client" placeholder="סטודיו נואר"></label>
+            <label>שנה <input name="year" type="number" placeholder="2026" dir="ltr"></label>
+          </div>
+          <label>קטגוריה
+            <select name="category"></select>
+          </label>
+          <label>תמונת תצוגה מקדימה (אופציונלי) <input name="poster" placeholder="assets/media/poster.jpg (ל-YouTube נלקח אוטומטית)" dir="ltr"></label>
+          <label>תיאור קצר (אופציונלי) <textarea name="description" rows="2"></textarea></label>
+          <label class="check"><input type="checkbox" name="featured"> להציג בדף הבית (עד 4 עבודות)</label>
+        </form>
+
+        <!-- ====== TESTIMONIAL FORM ====== -->
+        <form class="form" id="form-testimonial" hidden>
+          <label>הציטוט <textarea name="quote" rows="3" placeholder="מה הלקוח/ה אמר/ה…" required></textarea></label>
+          <div class="form__row">
+            <label>שם <input name="name" required></label>
+            <label>תפקיד <input name="role" placeholder="מנכ״לית"></label>
+          </div>
+          <div class="form__row">
+            <label>חברה <input name="company"></label>
+            <label>פרויקט <input name="project"></label>
+          </div>
+          <label>תמונה (אופציונלי) <input name="image" placeholder="assets/media/client.jpg" dir="ltr"></label>
+          <label>המלצת וידאו (אופציונלי) <input name="video" placeholder="קישור YouTube / Drive / Vimeo" dir="ltr"></label>
+          <label class="check"><input type="checkbox" name="featured"> להציג בדף הבית</label>
+        </form>
+
+        <div>
+          <div class="out-wrap">
+            <div class="code" id="out"></div>
+            <button class="btn btn--red copy" id="copy" type="button">העתקה</button>
+          </div>
+          <p id="status" class="form__hint" style="margin-top:10px"></p>
+          <div class="preview" id="preview"></div>
+          <ol class="steps" style="margin-top:28px">
+            <li><span>לוחצים <b>העתקה</b>.</span></li>
+            <li><span>פותחים בגיטהאב את הקובץ <a id="target-link" href="#" target="_blank" rel="noopener">content/works.js</a> ולוחצים על העיפרון ✎ (Edit).</span></li>
+            <li><span>מדביקים את הקוד <b>אחרי הסוגר } של הפריט האחרון</b>, לפני <b>];</b> שבסוף הקובץ.</span></li>
+            <li><span>לוחצים <b>Commit changes</b>. האתר מתעדכן תוך כדקה.</span></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="content/site.js"></script>
+  <script>
+  (function () {
+    var SITE = window.FORMAL_SITE || {};
+    var cats = SITE.categories || {};
+    var sel = document.querySelector('#form-work select[name="category"]');
+    Object.keys(cats).forEach(function (k) { var o = document.createElement("option"); o.value = k; o.textContent = cats[k]; sel.appendChild(o); });
+
+    var out = document.getElementById("out"), status = document.getElementById("status"), preview = document.getElementById("preview");
+    var fw = document.getElementById("form-work"), ft = document.getElementById("form-testimonial");
+    var link = document.getElementById("target-link");
+    var mode = "work";
+    var esc = function (s) { return String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"'); };
+    var escHtml = function (s) { return String(s).replace(/[&<>]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]; }); };
+
+    function detect(src) {
+      if (/youtu\.be\/|youtube\.com/.test(src)) return "youtube";
+      if (/drive\.google\.com/.test(src)) return "drive";
+      if (/vimeo\.com/.test(src)) return "vimeo";
+      if (/\.(mp4|webm|mov|m4v)(\?|$)/i.test(src)) return "file";
+      if (/\.(jpe?g|png|webp|gif|avif|svg)(\?|$)/i.test(src)) return "image";
+      return "";
+    }
+    function idOf(type, src) {
+      var m;
+      if (type === "youtube") { m = src.match(/(?:v=|youtu\.be\/|\/embed\/|\/shorts\/|\/live\/)([\w-]{11})/); return m ? m[1] : ""; }
+      if (type === "drive") { m = src.match(/\/d\/([\w-]+)/) || src.match(/[?&]id=([\w-]+)/); return m ? m[1] : ""; }
+      if (type === "vimeo") { m = src.match(/vimeo\.com\/(?:video\/)?(\d+)/); return m ? m[1] : ""; }
+      return src;
+    }
+    function slug(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+
+    function line(k, v, isStr) {
+      if (v === "" || v == null) return "";
+      return '    <span class="k">' + k + '</span>: ' + (isStr ? '<span class="s">"' + escHtml(esc(v)) + '"</span>' : v) + ",\n";
+    }
+
+    function renderWork() {
+      var d = Object.fromEntries(new FormData(fw).entries());
+      var type = d.type === "auto" ? (detect(d.src || "") || "image") : d.type;
+      var id = idOf(type, d.src || "");
+      var s = ",\n  {\n" + line("id", d.id, true) + line("title", d.title, true) + line("client", d.client, true) + line("year", d.year, false) +
+        line("category", d.category, true) + line("type", type, true) + line("src", d.src, true) + line("poster", d.poster, true) +
+        line("featured", fw.featured.checked ? "true" : "", false) + line("description", d.description, true);
+      s = s.replace(/,\n$/, "\n") + "  }";
+      out.innerHTML = s;
+      link.textContent = "content/works.js";
+      if (!d.src) { status.textContent = ""; preview.innerHTML = ""; return; }
+      if ((type === "youtube" || type === "drive" || type === "vimeo") && !id) { status.innerHTML = '<span class="bad">לא הצלחתי לזהות מזהה בקישור. בדקי שהקישור מלא.</span>'; preview.innerHTML = ""; return; }
+      status.innerHTML = '<span class="ok">זוהה: ' + type + (id && id !== d.src ? " · " + id : "") + '</span>';
+      if (type === "youtube") preview.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + id + '?rel=0&modestbranding=1&color=white" allowfullscreen></iframe>';
+      else if (type === "drive") preview.innerHTML = '<iframe src="https://drive.google.com/file/d/' + id + '/preview" allowfullscreen></iframe>';
+      else if (type === "vimeo") preview.innerHTML = '<iframe src="https://player.vimeo.com/video/' + id + '?title=0&byline=0&portrait=0" allowfullscreen></iframe>';
+      else if (type === "file") preview.innerHTML = '<video src="' + d.src + '" controls controlsList="nodownload"></video>';
+      else preview.innerHTML = '<img src="' + d.src + '" alt="">';
+    }
+    function renderTestimonial() {
+      var d = Object.fromEntries(new FormData(ft).entries());
+      var s = ",\n  {\n" + line("quote", d.quote, true) + line("name", d.name, true) + line("role", d.role, true) + line("company", d.company, true) +
+        line("project", d.project, true) + line("image", d.image, true) + line("video", d.video, true) + line("featured", ft.featured.checked ? "true" : "", false);
+      s = s.replace(/,\n$/, "\n") + "  }";
+      out.innerHTML = s;
+      link.textContent = "content/testimonials.js";
+      status.textContent = ""; preview.innerHTML = d.image ? '<img src="' + d.image + '" alt="">' : "";
+    }
+    function render() {
+      if (mode === "work") renderWork(); else renderTestimonial();
+      if (ghBase) link.href = ghBase + (mode === "work" ? "works.js" : "testimonials.js");
+    }
+
+    fw.addEventListener("input", function (e) {
+      if (e.target.name === "title" && !fw.id.dataset.touched) fw.id.value = slug(e.target.value) || "";
+      if (e.target.name === "id") fw.id.dataset.touched = "1";
+      render();
+    });
+    ft.addEventListener("input", render);
+    fw.addEventListener("submit", function (e) { e.preventDefault(); });
+    ft.addEventListener("submit", function (e) { e.preventDefault(); });
+
+    document.querySelectorAll("[data-tab]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        document.querySelectorAll("[data-tab]").forEach(function (x) { x.classList.remove("is-active"); });
+        b.classList.add("is-active"); mode = b.dataset.tab;
+        fw.hidden = mode !== "work"; ft.hidden = mode !== "testimonial"; render();
+      });
+    });
+
+    document.getElementById("copy").addEventListener("click", function () {
+      navigator.clipboard.writeText(out.textContent).then(function () { status.innerHTML = '<span class="ok">הועתק! עכשיו הדביקי בקובץ.</span>'; });
+    });
+
+    // link straight to the GitHub editor when running on GitHub Pages
+    var ghBase = "";
+    var m = location.hostname.match(/^([\w-]+)\.github\.io$/);
+    if (m) {
+      var repo = location.pathname.split("/")[1] || "formal";
+      ghBase = "https://github.com/" + m[1] + "/" + repo + "/edit/main/content/";
+    }
+    render();
+  })();
+  </script>
+</body>
+</html>

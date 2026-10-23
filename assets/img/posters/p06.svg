@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+
+<defs>
+  <filter id="grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.09 0"/>
+  </filter>
+  <filter id="blur60"><feGaussianBlur stdDeviation="60"/></filter>
+  <filter id="blur120"><feGaussianBlur stdDeviation="120"/></filter>
+  <radialGradient id="redglow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#e10600" stop-opacity="0.9"/><stop offset="1" stop-color="#e10600" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="whiteglow" cx="50%" cy="50%" r="50%">
+    <stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="vig" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#000" stop-opacity="0.35"/><stop offset="0.5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.6"/>
+  </linearGradient>
+</defs>
+<rect width="1600" height="1000" fill="#0a0a0a"/>
+
+    <ellipse cx="800" cy="150" rx="900" ry="300" fill="url(#whiteglow)" filter="url(#blur120)" opacity="0.5"/>
+    <rect x="350" y="300" width="260" height="440" fill="#141414" stroke="#fff" stroke-opacity="0.35"/>
+    <rect x="670" y="260" width="260" height="480" fill="#f2f2f2"/>
+    <rect x="990" y="300" width="260" height="440" fill="#e10600"/>
+    <rect x="700" y="640" width="200" height="4" fill="#e10600"/>
+    <rect x="380" y="640" width="200" height="4" fill="#f2f2f2" opacity="0.6"/>
+    <rect x="1020" y="640" width="200" height="4" fill="#f2f2f2"/>
+    <rect x="0" y="740" width="1600" height="260" fill="#000" opacity="0.7"/>
+    <text x="800" y="900" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="64" fill="#f2f2f2" text-anchor="middle" letter-spacing="16" >MONO</text>
+  
+<rect width="1600" height="1000" fill="url(#vig)"/>
+<rect width="1600" height="1000" filter="url(#grain)" opacity="0.9"/>
+</svg>
