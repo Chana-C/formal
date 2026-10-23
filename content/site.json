@@ -1,0 +1,47 @@
+{
+  "brand": "FORMAL",
+  "tagline": "גרפיקה · הפקה · אקשן",
+  "owner": {
+    "name": "השם שלך",
+    "role": "גרפיקאית ומפיקה",
+    "city": "ישראל"
+  },
+  "contact": {
+    "phone": "050-000-0000",
+    "whatsapp": "972500000000",
+    "email": "hello@formal.studio",
+    "instagram": "https://instagram.com/",
+    "behance": "https://behance.net/"
+  },
+  "categories": {
+    "video": "וידאו והפקה",
+    "branding": "מיתוג",
+    "print": "דפוס",
+    "digital": "דיגיטל",
+    "event": "הפקת אירועים"
+  },
+  "clients": [
+    "סטודיו נואר",
+    "Kaveret Coffee",
+    "פסטיבל הקולנוע הים-תיכוני",
+    "Mono Skincare",
+    "Pulse Fitness",
+    "גלריה 12",
+    "Atelier Shem",
+    "עיריית תל אביב-יפו",
+    "Red Hour Records",
+    "בית הספר לאמנויות",
+    "Luma Events",
+    "Formal Studio"
+  ],
+  "creditRoles": [
+    "לקוח",
+    "מיתוג",
+    "הפקה",
+    "קמפיין",
+    "עיצוב",
+    "וידאו"
+  ],
+  "adminApi": "",
+  "showSourceLink": false
+}

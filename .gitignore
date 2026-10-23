@@ -2,3 +2,6 @@ Thumbs.db
 .DS_Store
 *.log
 node_modules/
+admin-api/.dev.vars
+admin-api/.wrangler/
+.wrangler/

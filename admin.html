@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ניהול · FORMAL</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" href="assets/img/logo-icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700;900&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body class="admin-body">
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ============ LOGIN ============ -->
+  <section class="login" id="login" hidden>
+    <div class="login__card">
+      <img class="login__logo" src="assets/img/logo.png" alt="FORMAL" draggable="false">
+      <h1 class="login__title">כניסה לניהול</h1>
+      <p class="login__sub">רק למי שקיבל/ה הרשאה מבעלת האתר.</p>
+      <form class="form" id="login-form" autocomplete="on">
+        <label class="field"><input type="email" name="email" placeholder="מייל" required autocomplete="username" dir="ltr"></label>
+        <label class="field"><input type="password" name="password" placeholder="סיסמה" required autocomplete="current-password" dir="ltr"></label>
+        <button class="btn btn--red" type="submit" style="justify-self:stretch">כניסה</button>
+        <p class="form__hint login__error" id="login-error" hidden></p>
+      </form>
+      <p class="login__foot" id="login-noapi" hidden>ממשק הניהול עדיין לא חובר לשרת. הריצי <code>bash admin-api/deploy-admin.sh</code> כדי להפעיל אותו.</p>
+      <a class="login__back" href="index.html">← חזרה לאתר</a>
+    </div>
+  </section>
+
+  <!-- ============ APP ============ -->
+  <div class="app" id="app" hidden>
+    <header class="topbar">
+      <div class="topbar__brand">
+        <img src="assets/img/logo.png" alt="FORMAL" class="topbar__logo" draggable="false">
+        <span class="topbar__label">ניהול</span>
+      </div>
+      <div class="topbar__status" id="status" title="מצב הפרסום באתר"><i></i><span>מחובר</span></div>
+      <div class="topbar__user">
+        <span id="who"></span>
+        <a class="topbar__link" href="index.html" target="_blank" rel="noopener">צפייה באתר ↗</a>
+        <button class="topbar__link" type="button" id="logout">יציאה</button>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="אזורי ניהול">
+      <button class="tab is-active" role="tab" data-tab="works" aria-selected="true">עבודות</button>
+      <button class="tab" role="tab" data-tab="testimonials" aria-selected="false">המלצות</button>
+      <button class="tab" role="tab" data-tab="media" aria-selected="false">תמונות וקבצים</button>
+      <button class="tab" role="tab" data-tab="settings" aria-selected="false">הגדרות האתר</button>
+      <button class="tab" role="tab" data-tab="admins" aria-selected="false">מנהלים</button>
+      <button class="tab" role="tab" data-tab="help" aria-selected="false">איך מעלים?</button>
+    </nav>
+
+    <main class="panel">
+      <!-- ---------- WORKS ---------- -->
+      <section class="pane" data-pane="works">
+        <div class="pane__head">
+          <div><h2>עבודות</h2><p class="pane__sub">סרטונים ותמונות שמוצגים בדף העבודות ובדף הבית. גררי כדי לסדר, סמני ★ לדף הבית (עד 4).</p></div>
+          <button class="btn btn--red" type="button" data-new="work">+ עבודה חדשה</button>
+        </div>
+        <div class="list" id="works-list"></div>
+      </section>
+
+      <!-- ---------- TESTIMONIALS ---------- -->
+      <section class="pane" data-pane="testimonials" hidden>
+        <div class="pane__head">
+          <div><h2>המלצות לקוחות</h2><p class="pane__sub">ציטוטים, ואפשר לצרף תמונה או המלצת וידאו. ★ מציג את ההמלצה בדף הבית.</p></div>
+          <button class="btn btn--red" type="button" data-new="testimonial">+ המלצה חדשה</button>
+        </div>
+        <div class="list" id="testimonials-list"></div>
+      </section>
+
+      <!-- ---------- MEDIA ---------- -->
+      <section class="pane" data-pane="media" hidden>
+        <div class="pane__head">
+          <div><h2>תמונות וקבצים</h2><p class="pane__sub">קבצים שמאוחסנים באתר עצמו (תיקיית assets/media). תמונות: JPG / PNG / WebP עד 20MB. סרטונים ארוכים: דרך יוטיוב או דרייב.</p></div>
+          <label class="btn btn--red upload-btn">+ העלאת קבצים<input type="file" id="media-upload" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,.mp4,.webm,.pdf" multiple hidden></label>
+        </div>
+        <div class="media-grid" id="media-grid"></div>
+      </section>
+
+      <!-- ---------- SETTINGS ---------- -->
+      <section class="pane" data-pane="settings" hidden>
+        <div class="pane__head"><div><h2>הגדרות האתר</h2><p class="pane__sub">שם, פרטי קשר, לקוחות וקטגוריות.</p></div></div>
+        <form class="form settings-form" id="settings-form">
+          <h3 class="form__section">מי אני</h3>
+          <div class="form__row">
+            <label class="field"><span>שם מלא</span><input name="owner.name"></label>
+            <label class="field"><span>תפקיד</span><input name="owner.role" placeholder="גרפיקאית ומפיקה"></label>
+          </div>
+          <div class="form__row">
+            <label class="field"><span>עיר</span><input name="owner.city"></label>
+            <label class="field"><span>סלוגן</span><input name="tagline"></label>
+          </div>
+          <h3 class="form__section">יצירת קשר</h3>
+          <div class="form__row">
+            <label class="field"><span>טלפון להצגה</span><input name="contact.phone" dir="ltr" placeholder="050-000-0000"></label>
+            <label class="field"><span>וואטסאפ (בינלאומי, בלי +)</span><input name="contact.whatsapp" dir="ltr" placeholder="972500000000"></label>
+          </div>
+          <div class="form__row">
+            <label class="field"><span>מייל</span><input name="contact.email" dir="ltr" type="email"></label>
+            <label class="field"><span>אינסטגרם (קישור)</span><input name="contact.instagram" dir="ltr"></label>
+          </div>
+          <label class="field"><span>Behance / פורטפוליו חיצוני (קישור, אופציונלי)</span><input name="contact.behance" dir="ltr"></label>
+          <h3 class="form__section">לקוחות (רצועה נעה + קרדיטים)</h3>
+          <label class="field"><span>שם בכל שורה</span><textarea name="clients" rows="6"></textarea></label>
+          <label class="field"><span>תפקידים לקרדיטים (מופרדים בפסיק)</span><input name="creditRoles" placeholder="לקוח, מיתוג, הפקה"></label>
+          <h3 class="form__section">קטגוריות של עבודות</h3>
+          <div id="cats"></div>
+          <button class="btn btn--ghost btn--sm" type="button" id="cat-add">+ קטגוריה</button>
+          <h3 class="form__section">נגן</h3>
+          <label class="check"><input type="checkbox" name="showSourceLink"> להציג מתחת לסרטון קישור "לצפייה ב-YouTube / Drive" (לא מומלץ: מוציא את הצופים מהאתר ובדרייב עלול לאפשר הורדה)</label>
+          <div class="form__actions"><button class="btn btn--red" type="submit">שמירה ופרסום</button></div>
+        </form>
+      </section>
+
+      <!-- ---------- ADMINS ---------- -->
+      <section class="pane" data-pane="admins" hidden>
+        <div class="pane__head"><div><h2>מנהלים</h2><p class="pane__sub">מי יכול להיכנס לממשק הזה. רק בעלת האתר מוסיפה ומסירה מנהלים.</p></div></div>
+        <div class="list" id="admins-list"></div>
+        <form class="form card" id="admin-add" hidden>
+          <h3 class="form__section" style="margin-top:0">הוספת מנהל/ת</h3>
+          <div class="form__row">
+            <label class="field"><span>מייל</span><input name="email" type="email" dir="ltr" required></label>
+            <label class="field"><span>שם</span><input name="name" required></label>
+          </div>
+          <label class="field"><span>סיסמה ראשונית (לפחות 8 תווים). מסרי לו/לה בנפרד.</span><input name="password" type="text" dir="ltr" minlength="8" required></label>
+          <div class="form__actions"><button class="btn btn--red" type="submit">הוספה</button></div>
+        </form>
+        <form class="form card" id="pw-form">
+          <h3 class="form__section" style="margin-top:0">שינוי הסיסמה שלי</h3>
+          <label class="field"><span>סיסמה חדשה (לפחות 8 תווים)</span><input name="password" type="password" dir="ltr" minlength="8" required autocomplete="new-password"></label>
+          <div class="form__actions"><button class="btn btn--ghost" type="submit">עדכון סיסמה</button></div>
+        </form>
+      </section>
+
+      <!-- ---------- HELP ---------- -->
+      <section class="pane pane--help" data-pane="help" hidden>
+        <div class="pane__head"><div><h2>איך מעלים תוכן?</h2><p class="pane__sub">שלוש דרכים, לפי סוג הקובץ.</p></div></div>
+        <div class="help-grid">
+          <article class="card">
+            <h3>🎬 סרטון דרך YouTube <small>מומלץ</small></h3>
+            <ol>
+              <li>מעלים את הסרטון ליוטיוב (studio.youtube.com → Create → Upload).</li>
+              <li>ב-Visibility בוחרים <b>Unlisted / לא רשום</b>. הסרטון לא יופיע בחיפוש, רק באתר.</li>
+              <li>מעתיקים את הקישור של הסרטון.</li>
+              <li>כאן: עבודות → + עבודה חדשה → מדביקים את הקישור → שמירה.</li>
+            </ol>
+            <p class="muted">הנגן באתר הוא נגן יוטיוב בלי כפתור הורדה ובלי המלצות. התמונה המקדימה נלקחת אוטומטית.</p>
+          </article>
+          <article class="card">
+            <h3>📁 סרטון דרך Google Drive</h3>
+            <ol>
+              <li>מעלים את הקובץ לדרייב.</li>
+              <li>קליק ימני → <b>שיתוף</b> → "כל מי שיש לו את הקישור" → <b>צופה</b>.</li>
+              <li>באותו חלון: ⚙ → <b>מבטלים</b> "צופים יכולים להוריד, להדפיס ולהעתיק".</li>
+              <li>מעתיקים קישור → כאן: עבודות → + עבודה חדשה → מדביקים → שמירה.</li>
+            </ol>
+            <p class="muted">בלי שלב 3, מי שימצא את הקישור יוכל להוריד. עם שלב 3, לא.</p>
+          </article>
+          <article class="card">
+            <h3>🖼 תמונות</h3>
+            <ol>
+              <li>כאן: תמונות וקבצים → + העלאת קבצים (אפשר כמה בבת אחת).</li>
+              <li>אחרי ההעלאה לוחצים "העתקת נתיב".</li>
+              <li>עבודות → + עבודה חדשה → סוג "תמונה" → מדביקים את הנתיב, או לוחצים "בחירה מהקבצים".</li>
+            </ol>
+            <p class="muted">מומלץ JPG או WebP ברוחב 1600–2000 פיקסלים. התמונות באתר מוגנות מגרירה, קליק ימני ושמירה.</p>
+          </article>
+          <article class="card">
+            <h3>📨 Jumbo Mail</h3>
+            <p>ג'מבו מייל הוא שירות להעברת קבצים, לא לאחסון: הקישורים פגים אחרי כמה ימים ואי אפשר להטמיע אותם באתר. השתמשי בו רק כדי להעביר קבצים (למשל מהמחשב של העורך אלייך), ואז העלי ליוטיוב, לדרייב, או כאן לתמונות וקבצים.</p>
+          </article>
+          <article class="card">
+            <h3>⏱ מתי זה עולה לאוויר?</h3>
+            <p>כל שמירה נשמרת ישירות באתר (כקומיט בגיטהאב על שמך). האתר מתעדכן תוך כדקה. אפשר לעקוב בנקודה שלמעלה: אדומה = בבנייה, לבנה = פורסם.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============ EDITOR DIALOG ============ -->
+  <div class="editor" id="editor" hidden>
+    <div class="editor__backdrop" data-editor-close></div>
+    <div class="editor__dialog" role="dialog" aria-modal="true" aria-labelledby="editor-title">
+      <header class="editor__head"><h2 id="editor-title">עבודה</h2><button class="editor__close" type="button" data-editor-close aria-label="סגירה">✕</button></header>
+      <form class="form editor__form" id="editor-form"></form>
+      <div class="editor__preview protected" id="editor-preview" hidden></div>
+      <footer class="editor__foot">
+        <button class="btn btn--ghost" type="button" data-editor-close>ביטול</button>
+        <button class="btn btn--red" type="submit" form="editor-form">שמירה ופרסום</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ============ FILE PICKER ============ -->
+  <div class="editor" id="picker" hidden>
+    <div class="editor__backdrop" data-picker-close></div>
+    <div class="editor__dialog editor__dialog--wide" role="dialog" aria-modal="true">
+      <header class="editor__head"><h2>בחירת קובץ</h2><button class="editor__close" type="button" data-picker-close aria-label="סגירה">✕</button></header>
+      <div class="media-grid media-grid--picker" id="picker-grid"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>

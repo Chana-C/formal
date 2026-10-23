@@ -1,0 +1,51 @@
+[
+  {
+    "quote": "בפעם הראשונה שראיתי את הסרטון בכיתי. היא לקחה רעיון מבולגן שלי והפכה אותו לסצנה.",
+    "name": "נועה ברק",
+    "role": "מנכ״לית",
+    "company": "סטודיו נואר",
+    "project": "קמפיין השקה · Noir",
+    "image": "assets/img/posters/p01.svg",
+    "featured": true
+  },
+  {
+    "quote": "עיצוב שעובד. המכירות בסניפים עלו בחודש הראשון אחרי המיתוג החדש, ואנשים מצלמים את הכוסות.",
+    "name": "יואב כהן",
+    "role": "בעלים",
+    "company": "Kaveret Coffee",
+    "project": "מיתוג מחדש",
+    "image": "assets/img/posters/p02.svg"
+  },
+  {
+    "quote": "הפקה בלילה אחד, שלושה לוקיישנים, אפס דרמה. היא פשוט מנהלת סט כמו מנצחת על תזמורת.",
+    "name": "דניאל לוי",
+    "role": "אמן",
+    "company": "Red Hour Records",
+    "project": "קליפ · Red Hour",
+    "video": "https://www.youtube.com/watch?v=eRsGyueVLvQ",
+    "image": "assets/img/posters/p03.svg"
+  },
+  {
+    "quote": "הפוסטרים שלה היו הדבר הכי מצולם בפסטיבל. כולל הסרטים.",
+    "name": "מיכל אדר",
+    "role": "מנהלת אמנותית",
+    "company": "פסטיבל הקולנוע הים-תיכוני",
+    "project": "סדרת פוסטרים"
+  },
+  {
+    "quote": "דיוק, טעם, ולוחות זמנים שמכבדים את עצמם. עבדנו עם הרבה סטודיואים – נשארנו איתה.",
+    "name": "עומר שחר",
+    "role": "סמנכ״ל שיווק",
+    "company": "Pulse Fitness",
+    "project": "קמפיין דיגיטל",
+    "image": "assets/img/posters/p07.svg"
+  },
+  {
+    "quote": "ערב הגאלה נראה כמו טקס אוסקר. האורחים חשבו שהבאנו הפקה מחו״ל.",
+    "name": "רונית פלד",
+    "role": "מפיקת אירועים",
+    "company": "Luma Events",
+    "project": "Gala 2025",
+    "image": "assets/img/posters/p08.svg"
+  }
+]
