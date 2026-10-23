@@ -24,9 +24,11 @@ gh auth setup-git >/dev/null 2>&1 || true
 
 # 2) זהות לקומיטים – לפי המשתמש המחובר (השם שלך, לא של כלי)
 LOGIN="$(gh api user --jq .login)"
+LOGIN_LC="$(printf '%s' "$LOGIN" | tr 'A-Z' 'a-z')"
+USER_ID="$(gh api user --jq .id)"
 NAME="$(gh api user --jq '.name // .login')"
-EMAIL="$(gh api user/emails --jq '[.[] | select(.primary)][0].email' 2>/dev/null || true)"
-[ -n "$EMAIL" ] && [ "$EMAIL" != "null" ] || EMAIL="${LOGIN}@users.noreply.github.com"
+# כתובת ה-noreply של גיטהאב תמיד משויכת לחשבון, גם בלי הרשאת user:email
+EMAIL="${USER_ID}+${LOGIN}@users.noreply.github.com"
 git config user.name  "$NAME"
 git config user.email "$EMAIL"
 echo "קומיטים ייחתמו בשם: $NAME <$EMAIL>"
@@ -44,7 +46,7 @@ else
 fi
 
 # 4) תמונת השיתוף (og:image) חייבת כתובת מלאה
-ABS="https://${LOGIN}.github.io/${REPO}/assets/img/og.png"
+ABS="https://${LOGIN_LC}.github.io/${REPO}/assets/img/og.png"
 if grep -q 'property="og:image" content="assets/img/og.png"' index.html; then
   sed -i "s|property=\"og:image\" content=\"assets/img/og.png\"|property=\"og:image\" content=\"${ABS}\"|" index.html
   git add index.html && git commit -q -m "og:image absolute url"
@@ -66,6 +68,6 @@ gh api -X POST "repos/${LOGIN}/${REPO}/pages" -f "source[branch]=${BRANCH}" -f "
 echo
 echo "========================================="
 echo " הקוד:   https://github.com/${LOGIN}/${REPO}"
-echo " האתר:   https://${LOGIN}.github.io/${REPO}/   (עולה לאוויר תוך 1-2 דקות)"
+echo " האתר:   https://${LOGIN_LC}.github.io/${REPO}/   (עולה לאוויר תוך 1-2 דקות)"
 echo " עריכה:  https://github.com/${LOGIN}/${REPO}/edit/${BRANCH}/content/works.js"
 echo "========================================="
