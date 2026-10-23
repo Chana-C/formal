@@ -66,6 +66,7 @@
 | `assets/css/style.css` · `assets/js/fog.js` · `hero.js` · `main.js` | העיצוב, מנוע הערפל, הפתיח, והלוגיקה |
 | `admin-api/` | שרת הניהול (Cloudflare Worker, חינם) + סקריפט פריסה |
 | `publish.sh` | העלאת שינויים בקוד לגיטהאב (לא נדרש לתוכן) |
+| `preview-admin.sh` | הרצה מקומית של האתר + ממשק הניהול |
 
 ## טקסט האודות ותמונה
 טקסט דף האודות נמצא ישירות ב-`about.html` (בתוך `<p> ... </p>`). התמונה: החליפי את `assets/img/portrait.svg` או שני את הנתיב ב-`about.html`.
@@ -94,14 +95,21 @@ bash admin-api/deploy-admin.sh
 bash publish.sh
 ```
 
-## תצוגה מקומית
-הדפים טוענים את התוכן מקבצי JSON, לכן צריך שרת מקומי קטן (לחיצה כפולה על index.html לא תציג עבודות):
+## תצוגה מקומית (גם כשהרשת חוסמת github.io / workers.dev)
+
+פקודה אחת מריצה את האתר ואת ממשק הניהול על המחשב שלך ופותחת את הממשק בדפדפן:
 
 ```bash
-cd ~/formal && python3 -m http.server 8080
+cd ~/formal && bash preview-admin.sh
 ```
 
-ואז http://localhost:8080/ בדפדפן. ממשק הניהול המקומי: http://localhost:8080/admin.html (פונה לאותו שרת ניהול; localhost מורשה אוטומטית).
+- האתר: http://localhost:8080/ · ממשק הניהול: http://localhost:8080/admin.html
+- בפעם הראשונה הסקריפט שואל מייל וסיסמה לכניסה המקומית (נשמרים רק במחשב הזה).
+- **השמירות מהממשק המקומי נכתבות לגיטהאב האמיתי**, כלומר האתר החי מתעדכן.
+- רשימת המנהלים של הממשק המקומי נפרדת מזו של הממשק החי.
+- לסגירה: Ctrl+C בטרמינל.
+
+לחיצה כפולה על index.html לא תציג עבודות, כי הדפים טוענים את התוכן מקבצי JSON דרך שרת.
 
 ## דומיין משלך (אופציונלי)
 ב-GitHub: **Settings → Pages → Custom domain**, ואצל ספק הדומיין רשומת `CNAME` ל-`chana-c.github.io`. HTTPS אוטומטי. אחרי זה מוסיפים את הדומיין החדש ל-`ALLOWED_ORIGINS` ב-`admin-api/wrangler.toml` ומריצים שוב את `deploy-admin.sh`.
