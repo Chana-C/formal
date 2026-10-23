@@ -158,15 +158,19 @@
       <div class="footer__grid">
         <div class="reveal">
           <h2 class="footer__title">צרו קשר</h2>
-          <p class="footer__text">כתבו כמה מילים על הפרויקט. הטופס פותח הודעת וואטסאפ מוכנה, ואני חוזרת תוך יום עסקים.</p>
-          <form class="form" data-contact-form style="margin-top:24px">
+          <p class="footer__text">כתבו כמה מילים על הפרויקט. ההודעה מגיעה ישירות אליי, ואני חוזרת תוך יום עסקים.</p>
+          <form class="form" data-contact-form style="margin-top:24px" novalidate="false">
             <div class="form__row">
               <label class="field"><input type="text" name="name" placeholder="שם מלא" required autocomplete="name"></label>
-              <label class="field"><input type="tel" name="phone" placeholder="טלפון" required autocomplete="tel"></label>
+              <label class="field"><input type="tel" name="phone" placeholder="טלפון" autocomplete="tel" dir="ltr"></label>
             </div>
+            <label class="field"><input type="email" name="email" placeholder="מייל (לא חובה אם השארתם טלפון)" autocomplete="email" dir="ltr"></label>
             <label class="field"><textarea name="message" rows="4" placeholder="כמה מילים על הפרויקט…" required></textarea></label>
-            <button class="btn btn--red" type="submit">שליחה בוואטסאפ</button>
-            <p class="form__hint">הפרטים לא נשמרים באתר. ההודעה נשלחת ישירות אליי.</p>
+            <label class="hp" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+            <label class="check"><input type="checkbox" name="consent" required><span>קראתי את <a href="privacy.html">מדיניות הפרטיות</a> ואני מסכים/ה שהפרטים ישמשו למענה לפנייתי.</span></label>
+            <button class="btn btn--red" type="submit">שליחה</button>
+            <p class="form__note" data-form-note hidden></p>
+            <p class="form__hint">ההודעה נשלחת למייל שלי בלבד. אף אחד אחר לא רואה אותה.</p>
           </form>
         </div>
         <div class="reveal" style="--d:0.1s">
@@ -184,13 +188,14 @@
             <li><a href="works.html">עבודות</a></li>
             <li><a href="about.html">אודות</a></li>
             <li><a href="clients.html">לקוחות</a></li>
+            <li><a href="privacy.html">מדיניות פרטיות ותנאי שימוש</a></li>
             <li><a href="#hero">חזרה למעלה</a></li>
           </ul>
         </div>
       </div>
       <div class="footer__bottom">
         <span class="logo"><img class="logo__img" src="assets/img/logo.png" alt="FORMAL" draggable="false"></span>
-        <span>© <span data-year></span> <span data-site="owner.name"></span> · <span data-site="owner.role"></span>. כל הזכויות שמורות.</span>
+        <span>© <span data-year></span> <span data-site="owner.name"></span> · <span data-site="owner.role"></span>. כל הזכויות שמורות. <a class="footer__legal" href="privacy.html">מדיניות פרטיות ותנאי שימוש</a></span>
       </div>
     </div>
   </footer>

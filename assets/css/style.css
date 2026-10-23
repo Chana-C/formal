@@ -599,3 +599,18 @@ body.menu-open .burger span:nth-child(3) { top: 21px; transform: rotate(-45deg);
   .reveal { opacity: 1; transform: none; }
   .grain { animation: none; }
 }
+
+/* ---------- contact form extras / legal ---------- */
+.check { display: flex; align-items: flex-start; gap: 10px; color: var(--fg-dim); font-size: 0.9rem; line-height: 1.5; }
+.check input { width: 18px; height: 18px; accent-color: var(--red); margin-top: 3px; flex: none; }
+.check a { color: var(--fg); border-bottom: 1px solid var(--red); }
+.hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+.form__note { font-size: 0.95rem; color: var(--fg); padding: 12px 16px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--bg-2); }
+.form__note--error { border-color: var(--red); color: var(--red-2); }
+.footer__legal { color: var(--fg-dim); border-bottom: 1px solid var(--line-2); margin-inline-start: 6px; transition: color 0.3s, border-color 0.3s; }
+.footer__legal:hover { color: var(--fg); border-color: var(--red); }
+.footer__admin { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.2em; color: var(--fg-mute); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; transition: color 0.3s, border-color 0.3s; }
+.footer__admin:hover { color: var(--fg); border-color: var(--red); }
+.modal__source { margin-top: 10px; font-size: 0.9rem; }
+.modal__source a { color: var(--fg-dim); border-bottom: 1px solid var(--line-2); }
+.modal__source a:hover { color: var(--fg); border-color: var(--red); }

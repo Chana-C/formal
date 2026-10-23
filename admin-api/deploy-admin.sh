@@ -85,6 +85,16 @@ if ! has_secret OWNER_PASSWORD; then
   echo "OWNER_PASSWORD ✓"
 fi
 
+if ! has_secret WEB3FORMS_KEY; then
+  echo
+  echo "שליחת פניות מטופס יצירת הקשר למייל שלך (אופציונלי, חינם):"
+  echo "  1) היכנסי ל-https://web3forms.com והזיני את המייל שאליו תרצי לקבל פניות."
+  echo "  2) יישלח אלייך מייל עם Access Key. הדביקי אותו כאן."
+  echo "  (Enter = לדלג. הפניות יישמרו בינתיים רק בלשונית 'פניות' בממשק הניהול. אפשר להריץ שוב בכל עת.)"
+  read -r -p "WEB3FORMS_KEY: " WK
+  if [ -n "$WK" ]; then printf '%s' "$WK" | $W secret put WEB3FORMS_KEY >/dev/null && echo "WEB3FORMS_KEY ✓"; fi
+fi
+
 # 5) רישום כתובת ה-API באתר (content/site.json) ודחיפה
 cd "$ROOT"
 node -e '

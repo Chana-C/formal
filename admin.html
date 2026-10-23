@@ -54,6 +54,7 @@
       <button class="tab" role="tab" data-tab="media" aria-selected="false">תמונות וקבצים</button>
       <button class="tab" role="tab" data-tab="settings" aria-selected="false">הגדרות האתר</button>
       <button class="tab" role="tab" data-tab="admins" aria-selected="false">מנהלים</button>
+      <button class="tab" role="tab" data-tab="messages" aria-selected="false" id="tab-messages" hidden>פניות <span class="tab__count" id="messages-count" hidden></span></button>
       <button class="tab" role="tab" data-tab="help" aria-selected="false">איך מעלים?</button>
     </nav>
 
@@ -138,6 +139,15 @@
           <label class="field"><span>סיסמה חדשה (לפחות 8 תווים)</span><input name="password" type="password" dir="ltr" minlength="8" required autocomplete="new-password"></label>
           <div class="form__actions"><button class="btn btn--ghost" type="submit">עדכון סיסמה</button></div>
         </form>
+      </section>
+
+      <!-- ---------- MESSAGES (owner only) ---------- -->
+      <section class="pane" data-pane="messages" hidden>
+        <div class="pane__head">
+          <div><h2>פניות מהאתר</h2><p class="pane__sub" id="messages-sub">הודעות שנשלחו דרך טופס יצירת הקשר. רואה אותן רק בעלת האתר. נשמרות עד 180 יום.</p></div>
+          <button class="btn btn--ghost btn--sm" type="button" id="messages-refresh">רענון</button>
+        </div>
+        <div class="list" id="messages-list"></div>
       </section>
 
       <!-- ---------- HELP ---------- -->

@@ -374,17 +374,43 @@
       cr.innerHTML = '<div class="credits__track">' + list + list + '</div>';
     }
 
-    /* contact form -> WhatsApp / mail */
+    /* contact form -> owner's inbox (via admin API); WhatsApp fallback when no API is configured */
     var form = $("[data-contact-form]");
     if (form) {
-      form.addEventListener("submit", function (e) {
+      var apiBase = String(SITE.adminApi || "").replace(/\/+$/, "");
+      var note = $("[data-form-note]", form);
+      var showNote = function (text, isErr) { if (!note) return; note.textContent = text; note.hidden = false; note.classList.toggle("form__note--error", !!isErr); };
+      form.addEventListener("submit", async function (e) {
         e.preventDefault();
         var fd = new FormData(form);
-        var msg = "היי, הגעתי דרך האתר FORMAL.\n" + "שם: " + (fd.get("name") || "") + "\n" + "טלפון: " + (fd.get("phone") || "") + "\n" + "פרויקט: " + (fd.get("message") || "");
         var wa = (SITE.contact && SITE.contact.whatsapp || "").replace(/\D/g, "");
-        if (wa) window.open("https://wa.me/" + wa + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
-        else if (SITE.contact && SITE.contact.email) location.href = "mailto:" + SITE.contact.email + "?subject=" + encodeURIComponent("פנייה מהאתר") + "&body=" + encodeURIComponent(msg);
+        var waText = "היי, הגעתי דרך האתר FORMAL.\nשם: " + (fd.get("name") || "") + "\nטלפון: " + (fd.get("phone") || "") + "\nפרויקט: " + (fd.get("message") || "");
+        if (!apiBase) {
+          if (wa) window.open("https://wa.me/" + wa + "?text=" + encodeURIComponent(waText), "_blank", "noopener");
+          else if (SITE.contact && SITE.contact.email) location.href = "mailto:" + SITE.contact.email + "?subject=" + encodeURIComponent("פנייה מהאתר") + "&body=" + encodeURIComponent(waText);
+          return;
+        }
+        var btn = $("button[type=submit]", form); btn.disabled = true; var label = btn.textContent; btn.textContent = "שולח…";
+        try {
+          var res = await fetch(apiBase + "/api/contact", { method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: fd.get("name"), phone: fd.get("phone"), email: fd.get("email"), message: fd.get("message"), consent: !!fd.get("consent"), website: fd.get("website"), page: location.href }) });
+          var data = null; try { data = await res.json(); } catch (x) {}
+          if (!res.ok) throw new Error((data && data.error) || "השליחה נכשלה");
+          form.reset();
+          showNote("תודה! ההודעה נשלחה אליי, ואחזור אלייך בהקדם.", false);
+        } catch (err) {
+          showNote(err.message + (wa ? " אפשר גם לכתוב לי בוואטסאפ דרך הקישור בפרטים." : ""), true);
+        }
+        btn.disabled = false; btn.textContent = label;
       });
     }
+
+    /* discreet admin link, shown only in a browser that has logged in to the admin before */
+    try {
+      if (localStorage.getItem("formal_admin_token")) {
+        var fb = $(".footer__bottom");
+        if (fb && !$(".footer__admin")) { var a = document.createElement("a"); a.className = "footer__admin"; a.href = "admin.html"; a.textContent = "ניהול ✎"; fb.appendChild(a); }
+      }
+    } catch (e) {}
   }
 })();

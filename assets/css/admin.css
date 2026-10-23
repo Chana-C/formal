@@ -128,3 +128,9 @@ code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-3)
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 900; background: var(--fg); color: #0a0a0a; padding: 12px 20px; border-radius: 999px; font-size: 0.92rem; font-weight: 500; box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.8); animation: toastIn 0.4s var(--ease-out); max-width: calc(100vw - 32px); text-align: center; }
 .toast--error { background: var(--red); color: #fff; }
 @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 16px); } }
+
+/* messages */
+.tab__count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--red); color: #fff; font-family: var(--font-mono); font-size: 0.65rem; margin-inline-start: 6px; }
+.row--msg { grid-template-columns: 1fr auto; align-items: start; }
+.row__msg { white-space: pre-wrap; color: var(--fg); margin: 8px 0 4px; font-size: 0.98rem; line-height: 1.6; }
+.row--msg .row__meta a { color: var(--fg-dim); } .row--msg .row__meta a:hover { color: var(--fg); }

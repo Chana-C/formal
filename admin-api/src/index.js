@@ -2,10 +2,12 @@
    FORMAL · Admin API (Cloudflare Worker)
    ---------------------------------------------------------
    כניסה במייל + סיסמה, ניהול מנהלים, קריאה/כתיבה של קבצי התוכן
-   (content/*.json) והעלאת מדיה (assets/media) ישירות לריפו בגיטהאב.
+   (content/*.json), העלאת מדיה (assets/media) ישירות לריפו בגיטהאב,
+   וקבלת פניות מטופס יצירת הקשר (נשלחות למייל של בעלת האתר).
    כל שמירה = קומיט בשם בעלת האתר → GitHub Pages מתעדכן תוך כדקה.
 
-   Secrets (wrangler secret put):  GITHUB_TOKEN, SESSION_SECRET, OWNER_EMAIL, OWNER_PASSWORD
+   Secrets (wrangler secret put):  GITHUB_TOKEN, SESSION_SECRET, OWNER_EMAIL, OWNER_PASSWORD,
+                                   WEB3FORMS_KEY (אופציונלי – שליחת פניות למייל)
    Vars (wrangler.toml):           GH_OWNER, GH_REPO, GH_BRANCH, ALLOWED_ORIGINS,
                                    COMMIT_NAME, COMMIT_EMAIL, MAX_UPLOAD_MB
    KV binding:                     ADMIN_KV
@@ -17,6 +19,7 @@ const CONTENT_FILES = { site: "content/site.json", works: "content/works.json", 
 const MEDIA_DIR = "assets/media";
 const ALLOWED_EXT = ["jpg", "jpeg", "png", "webp", "gif", "svg", "mp4", "webm", "pdf"];
 const TOKEN_TTL = 7 * 24 * 3600;
+const MSG_TTL = 180 * 24 * 3600;
 
 export default {
   async fetch(request, env) {
@@ -40,8 +43,9 @@ async function route(request, env, url) {
   const seg = p.split("/").filter(Boolean); // ["api", ...]
   if (seg[0] !== "api") return json({ ok: true, service: "formal-admin" });
 
-  if (m === "POST" && p === "/api/login") return login(request, env);
   if (m === "GET" && p === "/api/health") return json({ ok: true });
+  if (m === "POST" && p === "/api/login") return login(request, env);
+  if (m === "POST" && p === "/api/contact") return contact(request, env);
 
   const admin = await requireAuth(request, env);
 
@@ -62,6 +66,10 @@ async function route(request, env, url) {
     if (m === "POST" && !seg[2]) return addAdmin(request, env, admin);
     if (m === "DELETE" && seg[2]) return removeAdmin(env, decodeURIComponent(seg[2]), admin);
   }
+  if (seg[1] === "messages") {
+    if (m === "GET" && !seg[2]) return listMessages(env, admin);
+    if (m === "DELETE" && seg[2]) return deleteMessage(env, decodeURIComponent(seg[2]), admin);
+  }
   if (m === "POST" && p === "/api/password") return changePassword(request, env, admin);
 
   throw httpError(404, "נתיב לא קיים");
@@ -81,7 +89,7 @@ function corsHeaders(request, env) {
   return {
     "Access-Control-Allow-Origin": ok ? origin : (allowed[0] || "null"),
     "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-    "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Filename",
+    "Access-Control-Allow-Headers": "Authorization,Content-Type,X-Filename,X-Encoding",
     "Access-Control-Max-Age": "86400",
     "Vary": "Origin"
   };
@@ -99,12 +107,18 @@ function b64encode(bytes) {
 function b64decode(str) { return Uint8Array.from(atob(str), c => c.charCodeAt(0)); }
 function b64url(bytes) { return b64encode(bytes).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
 function b64urlDecode(str) { str = str.replace(/-/g, "+").replace(/_/g, "/"); while (str.length % 4) str += "="; return b64decode(str); }
-function utf8ToB64(str) { return b64encode(te.encode(str)); }
 function b64ToUtf8(b64) { return td.decode(b64decode(b64.replace(/\n/g, ""))); }
 
 function normEmail(e) { return String(e || "").trim().toLowerCase(); }
 function isEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 function slug(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60); }
+function cleanStr(v, max = 2000) { return v == null ? "" : String(v).trim().slice(0, max); }
+
+async function rateLimit(env, key, max, ttl, message) {
+  const n = Number(await env.ADMIN_KV.get(key)) || 0;
+  if (n >= max) throw httpError(429, message);
+  await env.ADMIN_KV.put(key, String(n + 1), { expirationTtl: ttl });
+}
 
 /* ---------------- passwords & tokens ---------------- */
 async function hashPassword(password, saltB64) {
@@ -143,7 +157,6 @@ async function verifyToken(env, token) {
 async function getAdmins(env) {
   let admins = await env.ADMIN_KV.get("admins", "json");
   if (!admins || !Object.keys(admins).length) {
-    // bootstrap: the owner from secrets
     const email = normEmail(env.OWNER_EMAIL);
     if (!isEmail(email) || !env.OWNER_PASSWORD) throw httpError(500, "לא הוגדרו OWNER_EMAIL / OWNER_PASSWORD");
     const { salt, hash } = await hashPassword(env.OWNER_PASSWORD);
@@ -200,7 +213,7 @@ async function addAdmin(request, env, actor) {
   requireOwner(actor);
   const body = await readJson(request);
   const email = normEmail(body.email);
-  const name = String(body.name || "").trim().slice(0, 80);
+  const name = cleanStr(body.name, 80);
   const password = String(body.password || "");
   if (!isEmail(email)) throw httpError(400, "כתובת מייל לא תקינה");
   if (password.length < 8) throw httpError(400, "סיסמה חייבת להכיל לפחות 8 תווים");
@@ -239,6 +252,7 @@ async function changePassword(request, env, actor) {
 function ghBase(env) { return `https://api.github.com/repos/${env.GH_OWNER}/${env.GH_REPO}`; }
 async function gh(env, path, opts = {}) {
   if (!env.GITHUB_TOKEN) throw httpError(500, "GITHUB_TOKEN לא הוגדר");
+  const body = opts.rawBody != null ? opts.rawBody : (opts.body ? JSON.stringify(opts.body) : undefined);
   const res = await fetch(path.startsWith("http") ? path : ghBase(env) + path, {
     method: opts.method || "GET",
     headers: {
@@ -246,9 +260,9 @@ async function gh(env, path, opts = {}) {
       "Accept": "application/vnd.github+json",
       "X-GitHub-Api-Version": "2022-11-28",
       "User-Agent": "formal-admin-worker",
-      ...(opts.body ? { "Content-Type": "application/json" } : {})
+      ...(body ? { "Content-Type": "application/json" } : {})
     },
-    body: opts.body ? JSON.stringify(opts.body) : undefined
+    body
   });
   if (res.status === 404 && opts.allow404) return null;
   if (!res.ok) {
@@ -274,7 +288,10 @@ async function commitFiles(env, files, message, actor) {
   const tree = [];
   for (const f of files) {
     if (f.delete) { tree.push({ path: f.path, mode: "100644", type: "blob", sha: null }); continue; }
-    const blob = await gh(env, "/git/blobs", { method: "POST", body: f.base64 != null ? { content: f.base64, encoding: "base64" } : { content: f.text, encoding: "utf-8" } });
+    // base64 is JSON-safe, so the body is assembled by concatenation (no re-encoding of large uploads)
+    const blob = f.base64 != null
+      ? await gh(env, "/git/blobs", { method: "POST", rawBody: '{"content":"' + f.base64 + '","encoding":"base64"}' })
+      : await gh(env, "/git/blobs", { method: "POST", body: { content: f.text, encoding: "utf-8" } });
     tree.push({ path: f.path, mode: "100644", type: "blob", sha: blob.sha });
   }
   const newTree = await gh(env, "/git/trees", { method: "POST", body: { base_tree: head.tree.sha, tree } });
@@ -291,8 +308,6 @@ async function getContent(env, name) {
   let data; try { data = JSON.parse(f.text); } catch { throw httpError(500, "קובץ התוכן בריפו אינו JSON תקין"); }
   return json({ data, sha: f.sha });
 }
-
-function cleanStr(v, max = 2000) { return v == null ? "" : String(v).trim().slice(0, max); }
 
 function validateWorks(list) {
   if (!Array.isArray(list)) throw httpError(400, "works חייב להיות רשימה");
@@ -376,20 +391,31 @@ async function listMedia(env) {
 }
 
 async function upload(request, env, url, actor) {
-  const maxMb = Number(env.MAX_UPLOAD_MB || 20);
+  const maxBytes = Number(env.MAX_UPLOAD_MB || 20) * 1024 * 1024;
   const rawName = decodeURIComponent(url.searchParams.get("name") || request.headers.get("X-Filename") || "file");
   const ext = (rawName.split(".").pop() || "").toLowerCase();
   if (!ALLOWED_EXT.includes(ext)) throw httpError(400, "סוג קובץ לא נתמך. מותר: " + ALLOWED_EXT.join(", "));
-  const len = Number(request.headers.get("Content-Length") || 0);
-  if (len > maxMb * 1024 * 1024) throw httpError(413, `הקובץ גדול מדי (מקסימום ${maxMb}MB). לסרטונים ארוכים השתמשי ביוטיוב או בדרייב`);
-  const bytes = new Uint8Array(await request.arrayBuffer());
-  if (!bytes.length) throw httpError(400, "קובץ ריק");
-  if (bytes.length > maxMb * 1024 * 1024) throw httpError(413, `הקובץ גדול מדי (מקסימום ${maxMb}MB)`);
+  const declared = Number(request.headers.get("Content-Length") || 0);
+  if (declared > maxBytes * 1.4) throw httpError(413, `הקובץ גדול מדי (מקסימום ${env.MAX_UPLOAD_MB || 20}MB). לסרטונים ארוכים השתמשי ביוטיוב או בדרייב`);
+
+  // the admin UI sends base64 text (cheap for the Worker); raw bytes are also accepted
+  let b64, size;
+  if ((request.headers.get("X-Encoding") || "").toLowerCase() === "base64") {
+    b64 = (await request.text()).replace(/^data:[^;]*;base64,/, "").replace(/[\s"]/g, "");
+    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(b64)) throw httpError(400, "קידוד הקובץ לא תקין");
+    size = Math.floor(b64.length * 3 / 4) - (b64.endsWith("==") ? 2 : b64.endsWith("=") ? 1 : 0);
+  } else {
+    const bytes = new Uint8Array(await request.arrayBuffer());
+    size = bytes.length; b64 = b64encode(bytes);
+  }
+  if (!size) throw httpError(400, "קובץ ריק");
+  if (size > maxBytes) throw httpError(413, `הקובץ גדול מדי (מקסימום ${env.MAX_UPLOAD_MB || 20}MB)`);
+
   const base = slug(rawName.replace(/\.[^.]+$/, "")) || "file";
   const stamp = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "").slice(2);
   const path = `${MEDIA_DIR}/${base}-${stamp}.${ext}`;
-  const sha = await commitFiles(env, [{ path, base64: b64encode(bytes) }], `העלאת מדיה: ${base}.${ext}`, actor);
-  return json({ ok: true, path, commit: sha, size: bytes.length }, 201);
+  const sha = await commitFiles(env, [{ path, base64: b64 }], `העלאת מדיה: ${base}.${ext}`, actor);
+  return json({ ok: true, path, commit: sha, size }, 201);
 }
 
 async function deleteMedia(env, name, actor) {
@@ -398,6 +424,61 @@ async function deleteMedia(env, name, actor) {
   const exists = await gh(env, `/contents/${path}?ref=${env.GH_BRANCH}`, { allow404: true });
   if (!exists) throw httpError(404, "הקובץ לא נמצא");
   await commitFiles(env, [{ path, delete: true }], `מחיקת מדיה: ${name}`, actor);
+  return json({ ok: true });
+}
+
+/* ---------------- contact form → owner's inbox ---------------- */
+async function contact(request, env) {
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  const body = await readJson(request);
+  if (body.website) return json({ ok: true });          // honeypot field filled → bot, pretend success
+  const name = cleanStr(body.name, 120);
+  const phone = cleanStr(body.phone, 40);
+  const email = normEmail(body.email);
+  const message = cleanStr(body.message, 3000);
+  if (!name || !message) throw httpError(400, "חסרים שם או תוכן ההודעה");
+  if (!phone && !email) throw httpError(400, "השאירו טלפון או מייל כדי שנוכל לחזור אליכם");
+  if (email && !isEmail(email)) throw httpError(400, "כתובת המייל לא תקינה");
+  if (!body.consent) throw httpError(400, "יש לאשר את מדיניות הפרטיות");
+  await rateLimit(env, "contact:" + ip, 5, 3600, "נשלחו יותר מדי הודעות מהמחשב הזה. נסו שוב בעוד שעה");
+
+  const id = Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7);
+  const msg = { id, name, phone, email, message, at: new Date().toISOString(), page: cleanStr(body.page, 300) };
+  await env.ADMIN_KV.put("msg:" + id, JSON.stringify(msg), { expirationTtl: MSG_TTL });
+
+  let emailed = false;
+  if (env.WEB3FORMS_KEY) {
+    try {
+      const r = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          access_key: env.WEB3FORMS_KEY,
+          subject: "פנייה חדשה מהאתר FORMAL · " + name,
+          from_name: "FORMAL · טופס יצירת קשר",
+          name, phone: phone || "-", email: email || "לא נמסר",
+          replyto: email || undefined,
+          message: message + "\n\n---\nנשלח מהעמוד: " + (msg.page || "-") + "\nזמן: " + msg.at
+        })
+      });
+      emailed = r.ok;
+    } catch { emailed = false; }
+  }
+  return json({ ok: true, emailed });
+}
+
+async function listMessages(env, actor) {
+  requireOwner(actor);
+  const list = await env.ADMIN_KV.list({ prefix: "msg:", limit: 200 });
+  const msgs = [];
+  for (const k of list.keys) { const v = await env.ADMIN_KV.get(k.name, "json"); if (v) msgs.push(v); }
+  msgs.sort((a, b) => (a.at < b.at ? 1 : -1));
+  return json({ messages: msgs, emailEnabled: !!env.WEB3FORMS_KEY });
+}
+async function deleteMessage(env, id, actor) {
+  requireOwner(actor);
+  if (!/^[\w-]+$/.test(id)) throw httpError(400, "מזהה לא תקין");
+  await env.ADMIN_KV.delete("msg:" + id);
   return json({ ok: true });
 }
 

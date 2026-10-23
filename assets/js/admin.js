@@ -95,6 +95,27 @@
     watchBuild();
   }
 
+  /* ---------------- email suffix suggestions ---------------- */
+  var EMAIL_DOMAINS = ["gmail.com", "walla.co.il", "walla.com", "hotmail.com", "outlook.com", "yahoo.com", "icloud.com", "live.com", "012.net.il", "bezeqint.net", "netvision.net.il", "me.com"];
+  function attachEmailSuggest(input) {
+    if (!input || input.dataset.suggest) return;
+    var list = document.createElement("datalist");
+    list.id = "emails-" + Math.random().toString(36).slice(2, 8);
+    document.body.appendChild(list);
+    input.setAttribute("list", list.id);
+    input.setAttribute("autocapitalize", "off");
+    input.dataset.suggest = "1";
+    input.addEventListener("input", function () {
+      var v = input.value.trim(), at = v.indexOf("@");
+      if (at < 1) { list.innerHTML = ""; return; }
+      var local = v.slice(0, at), typed = v.slice(at + 1).toLowerCase();
+      list.innerHTML = EMAIL_DOMAINS.filter(function (d) { return d.indexOf(typed) === 0; }).slice(0, 8)
+        .map(function (d) { return '<option value="' + esc(local + "@" + d) + '">'; }).join("");
+    });
+  }
+  attachEmailSuggest($('#login-form input[name="email"]'));
+  attachEmailSuggest($('#admin-add input[name="email"]'));
+
   /* ---------------- auth ---------------- */
   function showLogin(noApi) {
     $("#app").hidden = true; $("#login").hidden = false;
@@ -138,6 +159,8 @@
     } catch (e) { toast(e.message, true); return; }
     renderWorks(); renderTestimonials(); renderSettings();
     loadMedia(); loadAdmins();
+    $("#tab-messages").hidden = me.role !== "owner";
+    if (me.role === "owner") loadMessages();
     api("/api/status").then(function (s) { lastBuild = s.updated; setStatus(s.status === "built" ? "is-built" : "", s.status === "built" ? "האתר מעודכן" : "מחובר"); }).catch(function () {});
     var last = localStorage.getItem("formal_admin_tab");
     if (last) switchTab(last);
@@ -362,10 +385,20 @@
     var g = $("#media-grid");
     g.innerHTML = state.media.length ? state.media.map(mediaCard.bind(null, false)).join("") : '<div class="empty-state" style="grid-column:1/-1">עדיין אין קבצים. לחצי "+ העלאת קבצים".</div>';
   }
+  function fileToBase64(file) {
+    return new Promise(function (resolve, reject) {
+      var fr = new FileReader();
+      fr.onload = function () { resolve(String(fr.result).split(",")[1] || ""); };
+      fr.onerror = function () { reject(new Error("לא הצלחתי לקרוא את הקובץ")); };
+      fr.readAsDataURL(file);
+    });
+  }
   async function uploadFile(file) {
     var maxMb = 20;
     if (file.size > maxMb * 1024 * 1024) throw new Error("הקובץ גדול מ-" + maxMb + "MB. לסרטונים השתמשי ביוטיוב או בדרייב.");
-    var r = await api("/api/media/upload?name=" + encodeURIComponent(file.name), { method: "POST", headers: { "Content-Type": file.type || "application/octet-stream" }, body: file });
+    // the browser encodes; the Worker just forwards (keeps it fast on Cloudflare's free plan)
+    var b64 = await fileToBase64(file);
+    var r = await api("/api/media/upload?name=" + encodeURIComponent(file.name), { method: "POST", headers: { "Content-Type": "text/plain", "X-Encoding": "base64" }, body: b64 });
     state.media.unshift({ name: r.path.split("/").pop(), path: r.path, size: r.size });
     renderMedia(); watchBuild();
     return r.path;
@@ -469,6 +502,41 @@
     try { await api("/api/admins", { method: "POST", json: v }); toast("נוסף/ה. מסרי את הסיסמה בנפרד."); e.target.reset(); loadAdmins(); }
     catch (ex) { toast(ex.message, true); }
   });
+  /* ---------------- messages (owner only) ---------------- */
+  async function loadMessages() {
+    var el = $("#messages-list");
+    try {
+      var r = await api("/api/messages");
+      state.messages = r.messages || [];
+      $("#messages-sub").textContent = r.emailEnabled
+        ? "כל פנייה נשלחת למייל שלך וגם נשמרת כאן כגיבוי עד 180 יום. רואה אותן רק בעלת האתר."
+        : "שליחה למייל עדיין לא הופעלה (הריצי שוב את deploy-admin.sh עם מפתח Web3Forms). בינתיים הפניות נשמרות כאן בלבד, עד 180 יום.";
+      var cnt = $("#messages-count"); cnt.textContent = state.messages.length; cnt.hidden = !state.messages.length;
+      el.innerHTML = state.messages.length ? state.messages.map(function (m) {
+        var when = new Date(m.at).toLocaleString("he-IL", { dateStyle: "medium", timeStyle: "short" });
+        return '<div class="row row--msg" data-id="' + esc(m.id) + '"><div>' +
+          '<div class="row__title">' + esc(m.name) + ' <span class="badge">' + esc(when) + '</span></div>' +
+          '<div class="row__meta" dir="ltr" style="text-align:right">' +
+            (m.phone ? '<a href="tel:' + esc(m.phone.replace(/[^\d+]/g, "")) + '">' + esc(m.phone) + '</a>' : "") +
+            (m.phone && m.email ? " · " : "") +
+            (m.email ? '<a href="mailto:' + esc(m.email) + '">' + esc(m.email) + '</a>' : "") + '</div>' +
+          '<p class="row__msg">' + esc(m.message) + '</p>' +
+          (m.page ? '<div class="row__meta">נשלח מ: ' + esc(m.page) + '</div>' : "") +
+          '</div><div class="row__actions">' +
+          (m.phone ? '<a class="ibtn" title="וואטסאפ" target="_blank" rel="noopener" href="https://wa.me/' + esc(m.phone.replace(/\D/g, "").replace(/^0/, "972")) + '">💬</a>' : "") +
+          '<button class="ibtn ibtn--danger" type="button" title="מחיקה" data-msg-del>✕</button></div></div>';
+      }).join("") : '<div class="empty-state">עדיין לא התקבלו פניות.</div>';
+    } catch (e) { el.innerHTML = '<div class="empty-state">' + esc(e.message) + '</div>'; }
+  }
+  $("#messages-refresh").addEventListener("click", loadMessages);
+  $("#messages-list").addEventListener("click", async function (e) {
+    var b = e.target.closest("[data-msg-del]"); if (!b) return;
+    var id = b.closest(".row").dataset.id;
+    if (!confirm("למחוק את הפנייה הזו?")) return;
+    try { await api("/api/messages/" + encodeURIComponent(id), { method: "DELETE" }); toast("נמחק"); loadMessages(); }
+    catch (ex) { toast(ex.message, true); }
+  });
+
   $("#pw-form").addEventListener("submit", async function (e) {
     e.preventDefault();
     var v = formValues(e.target);
