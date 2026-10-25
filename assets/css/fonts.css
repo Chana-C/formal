@@ -1,0 +1,15 @@
+/* Self-hosted fonts (no third-party requests). Variable fonts from the Google Fonts repo (OFL). */
+@font-face {
+  font-family: "Frank Ruhl Libre";
+  src: url("../fonts/FrankRuhlLibre.ttf") format("truetype");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Heebo";
+  src: url("../fonts/Heebo.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}

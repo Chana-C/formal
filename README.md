@@ -126,6 +126,6 @@ bash publish.sh
 ב-GitHub: **Settings → Pages → Custom domain**, ואצל ספק הדומיין רשומת `CNAME` ל-`chana-c.github.io`. HTTPS אוטומטי. אחרי זה מוסיפים את הדומיין החדש ל-`ALLOWED_ORIGINS` ב-`admin-api/wrangler.toml` ומריצים שוב את `deploy-admin.sh`.
 
 ## טכנולוגיות
-HTML5 · CSS3 · JavaScript · WebGL/GLSL (ערפל) · GSAP 3 (פתיח) · Google Fonts (Frank Ruhl Libre, Heebo) · GitHub Pages (אתר) · Cloudflare Workers + KV (ממשק ניהול, פניות) · Web3Forms (שליחת פניות למייל). בלי build, בלי מסד נתונים, בלי עלות.
+HTML5 · CSS3 · JavaScript · WebGL/GLSL (ערפל) · GSAP 3 מאוחסן באתר (פתיח) · פונטים מאוחסנים באתר (Frank Ruhl Libre, Heebo, רישיון OFL) · GitHub Pages (אתר) · Cloudflare Workers + KV (ממשק ניהול, פניות) · Web3Forms (שליחת פניות למייל). בלי build, בלי מסד נתונים, בלי עלות.
 
 </div>

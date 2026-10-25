@@ -1,6 +1,7 @@
 /* =========================================================
    FORMAL — hero intro: "אחד · שתיים · שלוש · אקשן"
-   GSAP timeline driving DOM + fog shader uniforms.
+   GSAP timeline driving DOM + fog shader uniforms + clapperboard.
+   Dev: add ?intro=hold:clapopen | hold:clapclosed to pause at a label.
    ========================================================= */
 (function () {
   "use strict";
@@ -8,7 +9,8 @@
   var hero = document.getElementById("hero");
   if (!hero) return;
 
-  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var devIntro = /[?&]intro=/.test(location.search);           // ?intro=hold:<label> forces the intro (dev/preview)
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches && !devIntro;
   var canvas = hero.querySelector(".hero__fog");
   var fog = null;
 
@@ -22,11 +24,17 @@
   var after = hero.querySelector(".hero__after");
   var scroll = hero.querySelector(".hero__scroll");
   var replay = hero.querySelector(".hero__replay");
-  var clapTop = hero.querySelector(".hero__clap--top");
-  var clapBot = hero.querySelector(".hero__clap--bottom");
   var flash = hero.querySelector(".hero__flash");
   var stage = hero.querySelector(".hero__stage");
   var tc = hero.querySelector(".hud__tc");
+  var clap = hero.querySelector(".clap");
+  var arm = hero.querySelector(".clap__arm");
+  var clapDate = hero.querySelector(".clap__date");
+
+  if (clapDate) {
+    var d = new Date(), p2 = function (n) { return (n < 10 ? "0" : "") + n; };
+    clapDate.textContent = p2(d.getDate()) + "." + p2(d.getMonth() + 1) + "." + String(d.getFullYear()).slice(2);
+  }
 
   // split "אקשן" into letters (keeps RTL order via DOM order)
   function split(el) {
@@ -71,7 +79,8 @@
     if (after) { after.style.opacity = 1; after.style.transform = "none"; }
     if (scroll) scroll.style.opacity = 1;
     if (replay) replay.hidden = true;
-    if (fog) fog.set("intensity", 1), fog.set("red", 0.6);
+    if (clap) clap.style.display = "none";
+    if (fog) { fog.set("intensity", 1); fog.set("red", 0.6); }
   }
 
   if (reduce || !window.gsap) { finalState(); return; }
@@ -79,15 +88,17 @@
   var gsap = window.gsap;
   var fx = fog ? fog.state : { flash: 0, red: 0, burst: 0, intensity: 0 };
   var tl;
+  var hold = (new URLSearchParams(location.search).get("intro") || "").replace(/^hold:/, "");
 
   function reset() {
     gsap.set(words, { opacity: 0, y: 0, scale: 1, filter: "blur(0px)", letterSpacing: "-0.02em" });
     if (action) gsap.set(action.querySelectorAll(".ch"), { opacity: 0, y: 0, x: 0, rotate: 0, scale: 1, filter: "blur(0px)" });
     gsap.set([after], { opacity: 0, y: 24 });
     gsap.set([scroll, replay], { opacity: 0 });
-    gsap.set([clapTop, clapBot], { scaleX: 0, opacity: 0 });
     gsap.set(flash, { opacity: 0 });
     gsap.set(stage, { x: 0, y: 0 });
+    if (clap) gsap.set(clap, { xPercent: -50, yPercent: 20, rotation: -7, opacity: 0 });
+    if (arm) gsap.set(arm, { rotation: -30, transformOrigin: "1.5% 100%" });
     fx.flash = 0; fx.red = 0; fx.burst = 0;
   }
 
@@ -112,8 +123,16 @@
     // 1 · 2 · 3
     tl.add(countWord(words[0], 0.95), 0.55);
     tl.add(countWord(words[1], 0.9), "-=0.15");
-    tl.add(countWord(words[2], 0.8), "-=0.15");
+    tl.addLabel("w3", "-=0.15");
+    tl.add(countWord(words[2], 0.8), "w3");
     tl.to(fx, { red: 0.35, duration: 2.0, ease: "sine.inOut" }, 1.2);
+
+    // clapperboard enters from below while "שלוש" is on screen, arm open
+    if (clap) {
+      tl.to(clap, { yPercent: -40, rotation: -2, opacity: 1, duration: 0.7, ease: "power3.out" }, "w3+=0.6");
+      tl.to(arm, { rotation: -22, duration: 0.45, ease: "sine.inOut" }, "w3+=0.9");
+    }
+    tl.addLabel("clapopen", "w3+=1.35");
 
     // tension beat
     tl.to(fx, { burst: 0.5, duration: 0.6, ease: "power2.in" }, "-=0.3");
@@ -126,23 +145,25 @@
       { opacity: 0, scale: 2.6, y: function () { return gsap.utils.random(-120, 120); }, x: function () { return gsap.utils.random(-220, 220); }, rotate: function () { return gsap.utils.random(-25, 25); }, filter: "blur(16px)" },
       { opacity: 1, scale: 1, y: 0, x: 0, rotate: 0, filter: "blur(0px)", duration: 0.7, ease: "expo.out", stagger: { each: 0.06, from: "center" } },
       "action");
-    // clapperboard snap
-    tl.to([clapTop, clapBot], { opacity: 1, scaleX: 1, duration: 0.22, ease: "expo.in" }, "action+=0.28");
-    tl.to([clapTop, clapBot], { opacity: 0, duration: 0.35, ease: "power2.out" }, "action+=0.52");
-    // flash + burst + shake
-    tl.to(flash, { opacity: 0.85, duration: 0.06, ease: "power1.in" }, "action+=0.5");
-    tl.to(flash, { opacity: 0, duration: 0.7, ease: "power3.out" }, "action+=0.56");
-    tl.to(fx, { flash: 0.9, duration: 0.06 }, "action+=0.5");
-    tl.to(fx, { flash: 0, duration: 1.1, ease: "power3.out" }, "action+=0.56");
-    tl.to(fx, { burst: 1.3, duration: 0.15, ease: "power2.in" }, "action+=0.5");
-    tl.to(fx, { burst: 0, duration: 3.2, ease: "power2.out" }, "action+=0.65");
-    tl.to(fx, { red: 1, duration: 0.3 }, "action+=0.5");
-    tl.to(fx, { red: 0.6, duration: 3, ease: "sine.out" }, "action+=0.8");
+    // the clapper arm snaps shut exactly as the word lands
+    if (arm) tl.to(arm, { rotation: 0, duration: 0.14, ease: "power4.in" }, "action+=0.42");
+    tl.addLabel("clapclosed", "action+=0.62");
+    // flash + burst + shake on the snap
+    tl.to(flash, { opacity: 0.85, duration: 0.06, ease: "power1.in" }, "action+=0.56");
+    tl.to(flash, { opacity: 0, duration: 0.7, ease: "power3.out" }, "action+=0.62");
+    tl.to(fx, { flash: 0.9, duration: 0.06 }, "action+=0.56");
+    tl.to(fx, { flash: 0, duration: 1.1, ease: "power3.out" }, "action+=0.62");
+    tl.to(fx, { burst: 1.3, duration: 0.15, ease: "power2.in" }, "action+=0.56");
+    tl.to(fx, { burst: 0, duration: 3.2, ease: "power2.out" }, "action+=0.71");
+    tl.to(fx, { red: 1, duration: 0.3 }, "action+=0.56");
+    tl.to(fx, { red: 0.6, duration: 3, ease: "sine.out" }, "action+=0.86");
     tl.to(stage, { keyframes: [
       { x: -8, y: 4, duration: 0.05 }, { x: 7, y: -5, duration: 0.05 }, { x: -5, y: 3, duration: 0.05 },
-      { x: 3, y: -2, duration: 0.05 }, { x: 0, y: 0, duration: 0.08 } ], ease: "none" }, "action+=0.5");
+      { x: 3, y: -2, duration: 0.05 }, { x: 0, y: 0, duration: 0.08 } ], ease: "none" }, "action+=0.56");
+    if (clap) tl.to(clap, { keyframes: [ { y: 6, duration: 0.05 }, { y: -4, duration: 0.05 }, { y: 0, duration: 0.06 } ], ease: "none" }, "action+=0.56");
 
-    // settle: word rises slightly, content appears
+    // the board drops out of frame; word rises; content appears
+    if (clap) tl.to(clap, { yPercent: 40, rotation: 6, opacity: 0, duration: 0.7, ease: "power3.in" }, "action+=1.05");
     tl.to(action, { y: -14, duration: 1.1, ease: "power3.inOut" }, "action+=1.0");
     tl.to(after, { opacity: 1, y: 0, duration: 1.1, ease: "power3.out" }, "action+=1.15");
     tl.to([scroll, replay], { opacity: 1, duration: 0.9, stagger: 0.15 }, "action+=1.6");
@@ -151,6 +172,8 @@
     tl.add(function () {
       gsap.to(action, { textShadow: "0 0 46px rgba(225,6,0,0.75), 0 0 110px rgba(225,6,0,0.4)", duration: 2.2, yoyo: true, repeat: -1, ease: "sine.inOut" });
     }, "action+=2.2");
+
+    if (hold && tl.labels[hold] != null) tl.pause(hold);   // jump straight to the label (preview)
   }
 
   build();

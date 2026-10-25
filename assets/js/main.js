@@ -119,27 +119,28 @@
     });
   }
 
-  /* custom cursor */
-  if (matchMedia("(hover: hover) and (pointer: fine)").matches && !reduce) {
-    var dot = document.createElement("div"); dot.className = "cursor";
-    var ring = document.createElement("div"); ring.className = "cursor-ring";
-    document.body.appendChild(dot); document.body.appendChild(ring);
-    var cx = innerWidth / 2, cy = innerHeight / 2, rx = cx, ry = cy;
-    document.body.classList.add("cursor-hidden");
+  /* custom cursor: the "o" play mark from the logo (desktop only, not in the admin) */
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches && !reduce && !document.body.classList.contains("admin-body")) {
+    var cur = document.createElement("div"); cur.className = "cursor"; cur.setAttribute("aria-hidden", "true");
+    var curImg = document.createElement("img"); curImg.src = "assets/img/cursor.png"; curImg.alt = ""; curImg.draggable = false;
+    cur.appendChild(curImg); document.body.appendChild(cur);
+    document.body.classList.add("has-cursor", "cursor-hidden");
+    var cx = innerWidth / 2, cy = innerHeight / 2, px = cx, py = cy;
     addEventListener("mousemove", function (e) {
       cx = e.clientX; cy = e.clientY;
-      dot.style.transform = "translate(" + cx + "px," + cy + "px)" + (document.body.classList.contains("cursor-hover") ? " scale(0.5)" : "");
       document.body.classList.remove("cursor-hidden");
       var t = e.target;
       var media = t.closest && t.closest(".work__media, .testimonial__media[data-play]");
-      var hover = t.closest && t.closest("a, button, .filter, input, textarea, [data-cursor]");
+      var hover = t.closest && t.closest("a, button, .filter, [data-cursor]");
+      var text = t.closest && t.closest("input, textarea, select");
       document.body.classList.toggle("cursor-media", !!media);
       document.body.classList.toggle("cursor-hover", !!hover && !media);
+      document.body.classList.toggle("cursor-text", !!text);
     }, { passive: true });
     document.addEventListener("mouseleave", function () { document.body.classList.add("cursor-hidden"); });
     (function loop() {
-      rx += (cx - rx) * 0.18; ry += (cy - ry) * 0.18;
-      ring.style.transform = "translate(" + rx + "px," + ry + "px)";
+      px += (cx - px) * 0.4; py += (cy - py) * 0.4;
+      cur.style.transform = "translate(" + px + "px," + py + "px)";
       requestAnimationFrame(loop);
     })();
   }
