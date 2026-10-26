@@ -134,3 +134,7 @@ code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-3)
 .row--msg { grid-template-columns: 1fr auto; align-items: start; }
 .row__msg { white-space: pre-wrap; color: var(--fg); margin: 8px 0 4px; font-size: 0.98rem; line-height: 1.6; }
 .row--msg .row__meta a { color: var(--fg-dim); } .row--msg .row__meta a:hover { color: var(--fg); }
+
+/* forgot / reset */
+.login__link { display: block; margin: 4px auto 0; color: var(--fg-mute); font-size: 0.85rem; border-bottom: 1px solid transparent; transition: color 0.3s, border-color 0.3s; }
+.login__link:hover { color: var(--fg); border-color: var(--red); }

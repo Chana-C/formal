@@ -15,6 +15,8 @@ ALLOWED_ORIGINS = "https://chana-c.github.io"
 COMMIT_NAME = "Chana-C"
 COMMIT_EMAIL = "142223141+Chana-C@users.noreply.github.com"
 MAX_UPLOAD_MB = "20"
+# כתובת דף הניהול – משמשת לקישורי איפוס סיסמה שנשלחים במייל
+ADMIN_URL = "https://chana-c.github.io/formal/admin.html"
 
 [[kv_namespaces]]
 binding = "ADMIN_KV"

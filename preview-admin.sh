@@ -37,7 +37,7 @@ sleep 1
 python3 -m http.server 8080 --bind 127.0.0.1 >/dev/null 2>&1 &
 SITE_PID=$!
 # שרת הניהול (מקומי)
-( cd admin-api && npx --yes wrangler@4 dev --port 8787 --ip 127.0.0.1 >/tmp/formal-admin-dev.log 2>&1 ) &
+( cd admin-api && npx --yes wrangler@4 dev --port 8787 --ip 127.0.0.1 --var DEV_MODE:1 --var ADMIN_URL:http://localhost:8080/admin.html >/tmp/formal-admin-dev.log 2>&1 ) &
 API_PID=$!
 cleanup() {
   kill $SITE_PID 2>/dev/null

@@ -45,6 +45,8 @@ async function route(request, env, url) {
 
   if (m === "GET" && p === "/api/health") return json({ ok: true });
   if (m === "POST" && p === "/api/login") return login(request, env);
+  if (m === "POST" && p === "/api/forgot") return forgot(request, env);
+  if (m === "POST" && p === "/api/reset") return resetPassword(request, env);
   if (m === "POST" && p === "/api/contact") return contact(request, env);
 
   const admin = await requireAuth(request, env);
@@ -203,6 +205,58 @@ async function login(request, env) {
   await env.ADMIN_KV.delete(failKey);
   const token = await issueToken(env, email);
   return json({ token, admin: publicAdmin({ email, ...a }) });
+}
+
+/* ---------------- forgot / reset password ----------------
+   The reset link is always e-mailed to the owner's inbox (Web3Forms delivers only there).
+   For another admin, the owner receives the link and forwards it. In DEV_MODE (local preview)
+   the link is returned on screen instead. */
+async function forgot(request, env) {
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  await rateLimit(env, "forgot:" + ip, 5, 3600, "יותר מדי בקשות איפוס. נסי שוב בעוד שעה");
+  const body = await readJson(request);
+  const email = normEmail(body.email);
+  if (!isEmail(email)) throw httpError(400, "כתובת מייל לא תקינה");
+  const admins = await getAdmins(env);
+  const result = { ok: true, emailEnabled: !!env.WEB3FORMS_KEY, dev: env.DEV_MODE === "1" };
+  const a = admins[email];
+  if (!a) return json(result);                       // never reveal whether the e-mail exists
+  const token = b64url(crypto.getRandomValues(new Uint8Array(32)));
+  await env.ADMIN_KV.put("reset:" + token, JSON.stringify({ email, at: Date.now() }), { expirationTtl: 1800 });
+  const base = env.ADMIN_URL || "admin.html";
+  const link = base + (base.includes("?") ? "&" : "?") + "reset=" + token;
+  if (env.DEV_MODE === "1") { result.devLink = link; return json(result); }
+  if (env.WEB3FORMS_KEY) {
+    const forOther = a.role !== "owner";
+    const message = (forOther
+      ? "התקבלה בקשה לאיפוס סיסמה עבור המנהל/ת " + email + ".\nאם זה מקובל עלייך, העבירי לו/לה את הקישור הבא (תקף 30 דקות):\n"
+      : "התקבלה בקשה לאיפוס הסיסמה שלך לממשק הניהול. הקישור תקף 30 דקות:\n") + link + "\n\nאם לא ביקשת איפוס, התעלמי מההודעה. הסיסמה הנוכחית נשארת בתוקף.";
+    try {
+      await fetch("https://api.web3forms.com/submit", {
+        method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({ access_key: env.WEB3FORMS_KEY, subject: "איפוס סיסמה · ממשק הניהול FORMAL", from_name: "FORMAL · ממשק ניהול", message })
+      });
+    } catch {}
+  }
+  return json(result);
+}
+
+async function resetPassword(request, env) {
+  const body = await readJson(request);
+  const token = String(body.token || "");
+  const password = String(body.password || "");
+  if (!/^[\w-]{20,}$/.test(token)) throw httpError(400, "קישור האיפוס לא תקין");
+  if (password.length < 8) throw httpError(400, "סיסמה חייבת להכיל לפחות 8 תווים");
+  const rec = await env.ADMIN_KV.get("reset:" + token, "json");
+  if (!rec) throw httpError(400, "קישור האיפוס פג תוקף או כבר נוצל. בקשי קישור חדש");
+  const admins = await getAdmins(env);
+  if (!admins[rec.email]) throw httpError(400, "המשתמש כבר לא קיים");
+  const { salt, hash } = await hashPassword(password);
+  admins[rec.email] = { ...admins[rec.email], salt, hash };
+  await saveAdmins(env, admins);
+  await env.ADMIN_KV.delete("reset:" + token);
+  await env.ADMIN_KV.delete("fail:" + (request.headers.get("CF-Connecting-IP") || "unknown"));
+  return json({ ok: true, email: rec.email });
 }
 
 async function listAdmins(env) {

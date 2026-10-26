@@ -120,7 +120,9 @@
   function showLogin(noApi) {
     $("#app").hidden = true; $("#login").hidden = false;
     $("#login-noapi").hidden = !noApi;
-    $("#login-form").hidden = !!noApi;
+    $("#login-form").hidden = !!noApi || !!resetToken;
+    $("#forgot-form").hidden = true;
+    $("#reset-form").hidden = !resetToken || !!noApi;
   }
   function logout(reload) {
     token = ""; localStorage.removeItem("formal_admin_token");
@@ -139,6 +141,40 @@
     btn.disabled = false;
   });
   $("#logout").addEventListener("click", function () { logout(true); });
+
+  /* forgot / reset password */
+  var loginForm = $("#login-form"), forgotForm = $("#forgot-form"), resetForm = $("#reset-form");
+  function showForms(which) { loginForm.hidden = which !== "login"; forgotForm.hidden = which !== "forgot"; resetForm.hidden = which !== "reset"; }
+  $("#forgot-open").addEventListener("click", function () { showForms("forgot"); $('#forgot-form input[name="email"]').value = $('#login-form input[name="email"]').value; });
+  $("#forgot-close").addEventListener("click", function () { showForms("login"); });
+  attachEmailSuggest($('#forgot-form input[name="email"]'));
+  forgotForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var note = $("#forgot-note"), btn = $("button[type=submit]", forgotForm); btn.disabled = true; note.hidden = true;
+    try {
+      var r = await api("/api/forgot", { method: "POST", json: { email: new FormData(forgotForm).get("email") } });
+      if (r.devLink) note.innerHTML = 'מצב מקומי (בלי מייל): <a href="' + esc(r.devLink) + '" style="color:var(--fg);border-bottom:1px solid var(--red)">לחצי כאן לאיפוס הסיסמה</a>';
+      else if (r.emailEnabled) note.textContent = "אם המייל רשום כמנהל/ת, נשלח עכשיו קישור לאיפוס למייל של בעלת האתר. בדקי גם בספאם. הקישור תקף 30 דקות.";
+      else note.innerHTML = "שליחת מיילים עדיין לא הופעלה (מפתח Web3Forms). לאיפוס מהמחשב, בטרמינל של אובונטו: <code>bash admin-api/reset-password.sh</code>";
+      note.hidden = false;
+    } catch (ex) { note.textContent = ex.message; note.hidden = false; }
+    btn.disabled = false;
+  });
+  var resetToken = new URLSearchParams(location.search).get("reset");
+  resetForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var fd = new FormData(resetForm), err = $("#reset-error"); err.hidden = true;
+    if (fd.get("password") !== fd.get("password2")) { err.textContent = "הסיסמאות לא זהות"; err.hidden = false; return; }
+    var btn = $("button[type=submit]", resetForm); btn.disabled = true;
+    try {
+      var r = await api("/api/reset", { method: "POST", json: { token: resetToken, password: fd.get("password") } });
+      history.replaceState(null, "", location.pathname);
+      resetToken = null; showForms("login");
+      $('#login-form input[name="email"]').value = r.email || "";
+      var le = $("#login-error"); le.textContent = "הסיסמה עודכנה. אפשר להיכנס."; le.style.color = "#7ee787"; le.hidden = false;
+    } catch (ex) { err.textContent = ex.message; err.hidden = false; }
+    btn.disabled = false;
+  });
 
   async function boot() {
     API = await resolveApi();

@@ -25,6 +25,21 @@
         <label class="field"><input type="password" name="password" placeholder="סיסמה" required autocomplete="current-password" dir="ltr"></label>
         <button class="btn btn--red" type="submit" style="justify-self:stretch">כניסה</button>
         <p class="form__hint login__error" id="login-error" hidden></p>
+        <button class="login__link" type="button" id="forgot-open">שכחתי סיסמה</button>
+      </form>
+      <form class="form" id="forgot-form" hidden>
+        <p class="login__sub" style="margin:0 0 6px">נשלח קישור לאיפוס (תקף 30 דקות) למייל של בעלת האתר.</p>
+        <label class="field"><input type="email" name="email" placeholder="המייל שלך לכניסה" required dir="ltr" autocomplete="username"></label>
+        <button class="btn btn--red" type="submit" style="justify-self:stretch">שליחת קישור לאיפוס</button>
+        <p class="form__hint" id="forgot-note" hidden></p>
+        <button class="login__link" type="button" id="forgot-close">חזרה לכניסה</button>
+      </form>
+      <form class="form" id="reset-form" hidden>
+        <p class="login__sub" style="margin:0 0 6px">בחרי סיסמה חדשה (לפחות 8 תווים).</p>
+        <label class="field"><input type="password" name="password" placeholder="סיסמה חדשה" required minlength="8" dir="ltr" autocomplete="new-password"></label>
+        <label class="field"><input type="password" name="password2" placeholder="שוב, לאימות" required minlength="8" dir="ltr" autocomplete="new-password"></label>
+        <button class="btn btn--red" type="submit" style="justify-self:stretch">עדכון סיסמה</button>
+        <p class="form__hint login__error" id="reset-error" hidden></p>
       </form>
       <p class="login__foot" id="login-noapi" hidden>ממשק הניהול עדיין לא חובר לשרת. הריצי <code>bash admin-api/deploy-admin.sh</code> כדי להפעיל אותו.</p>
       <a class="login__back" href="index.html">← חזרה לאתר</a>
