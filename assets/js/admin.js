@@ -463,7 +463,7 @@
     var data = {
       brand: s.brand || "FORMAL", tagline: v.tagline,
       owner: { name: v["owner.name"], role: v["owner.role"], city: v["owner.city"] },
-      contact: { phone: v["contact.phone"], whatsapp: v["contact.whatsapp"], email: v["contact.email"], instagram: v["contact.instagram"], behance: v["contact.behance"] },
+      contact: { phone: v["contact.phone"], email: v["contact.email"], behance: v["contact.behance"] },
       categories: cats,
       clients: String(v.clients || "").split("\n").map(function (x) { return x.trim(); }).filter(Boolean),
       creditRoles: String(v.creditRoles || "").split(",").map(function (x) { return x.trim(); }).filter(Boolean),
@@ -523,7 +523,6 @@
           '<p class="row__msg">' + esc(m.message) + '</p>' +
           (m.page ? '<div class="row__meta">נשלח מ: ' + esc(m.page) + '</div>' : "") +
           '</div><div class="row__actions">' +
-          (m.phone ? '<a class="ibtn" title="וואטסאפ" target="_blank" rel="noopener" href="https://wa.me/' + esc(m.phone.replace(/\D/g, "").replace(/^0/, "972")) + '">💬</a>' : "") +
           '<button class="ibtn ibtn--danger" type="button" title="מחיקה" data-msg-del>✕</button></div></div>';
       }).join("") : '<div class="empty-state">עדיין לא התקבלו פניות.</div>';
     } catch (e) { el.innerHTML = '<div class="empty-state">' + esc(e.message) + '</div>'; }

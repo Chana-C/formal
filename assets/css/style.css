@@ -293,7 +293,7 @@ body.menu-open .burger span:nth-child(3) { top: 21px; transform: rotate(-45deg);
 .hero__word .ch { display: inline-block; will-change: transform, opacity, filter; }
 
 /* clapperboard */
-.clap { position: absolute; left: 50%; top: 50%; z-index: 3; width: clamp(260px, 42vw, 560px); transform: translate(-50%, -40%); opacity: 0; pointer-events: none; filter: drop-shadow(0 40px 60px rgba(0, 0, 0, 0.75)); will-change: transform, opacity; }
+.clap { position: absolute; left: 50%; top: 50%; z-index: 3; width: clamp(260px, 42vw, 560px); opacity: 0; pointer-events: none; filter: drop-shadow(0 40px 60px rgba(0, 0, 0, 0.75)); will-change: transform, opacity; }
 .clap__arm { position: relative; width: 100%; aspect-ratio: 8 / 1.15; border: 3px solid #f2f2f2; border-bottom: 0; border-radius: 8px 8px 0 0; background: repeating-linear-gradient(-55deg, #0d0d0d 0 7.2%, #f2f2f2 7.2% 14.4%); transform-origin: 1.5% 100%; will-change: transform; }
 .clap__bar { width: 100%; aspect-ratio: 8 / 1.15; border: 3px solid #f2f2f2; border-bottom: 0; background: repeating-linear-gradient(55deg, #0d0d0d 0 7.2%, #f2f2f2 7.2% 14.4%); position: relative; }
 .clap__bar::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--red) 0 20%, transparent 20%); mix-blend-mode: multiply; opacity: 0.9; }

@@ -355,8 +355,7 @@ function validateSite(obj, current) {
     tagline: cleanStr(obj.tagline, 200),
     owner: { name: cleanStr(owner.name, 120), role: cleanStr(owner.role, 120), city: cleanStr(owner.city, 120) },
     contact: {
-      phone: cleanStr(contact.phone, 40), whatsapp: cleanStr(contact.whatsapp, 40).replace(/[^\d]/g, ""),
-      email: cleanStr(contact.email, 200), instagram: cleanStr(contact.instagram, 500), behance: cleanStr(contact.behance, 500)
+      phone: cleanStr(contact.phone, 40), email: cleanStr(contact.email, 200), behance: cleanStr(contact.behance, 500)
     },
     categories: cats,
     clients: (Array.isArray(obj.clients) ? obj.clients : []).map(c => cleanStr(c, 120)).filter(Boolean),

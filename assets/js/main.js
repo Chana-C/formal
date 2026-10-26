@@ -183,7 +183,6 @@
       if (el.tagName === "A") {
         if (/^tel/.test(el.dataset.siteHref || "")) el.href = "tel:" + String(v).replace(/[^\d+]/g, "");
         else if (el.dataset.siteHref === "mailto") el.href = "mailto:" + v;
-        else if (el.dataset.siteHref === "wa") el.href = "https://wa.me/" + String(SITE.contact && SITE.contact.whatsapp || v).replace(/\D/g, "");
         else if (el.dataset.siteHref === "url") el.href = v;
         if (!el.dataset.siteKeep) el.textContent = v;
       } else el.textContent = v;
@@ -375,7 +374,7 @@
       cr.innerHTML = '<div class="credits__track">' + list + list + '</div>';
     }
 
-    /* contact form -> owner's inbox (via admin API); WhatsApp fallback when no API is configured */
+    /* contact form -> owner's inbox (via admin API); e-mail fallback when no API is configured */
     var form = $("[data-contact-form]");
     if (form) {
       var apiBase = String(SITE.adminApi || "").replace(/\/+$/, "");
@@ -384,11 +383,9 @@
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
         var fd = new FormData(form);
-        var wa = (SITE.contact && SITE.contact.whatsapp || "").replace(/\D/g, "");
-        var waText = "היי, הגעתי דרך האתר FORMAL.\nשם: " + (fd.get("name") || "") + "\nטלפון: " + (fd.get("phone") || "") + "\nפרויקט: " + (fd.get("message") || "");
+        var mailText = "שם: " + (fd.get("name") || "") + "\nטלפון: " + (fd.get("phone") || "") + "\nמייל: " + (fd.get("email") || "") + "\n\n" + (fd.get("message") || "");
         if (!apiBase) {
-          if (wa) window.open("https://wa.me/" + wa + "?text=" + encodeURIComponent(waText), "_blank", "noopener");
-          else if (SITE.contact && SITE.contact.email) location.href = "mailto:" + SITE.contact.email + "?subject=" + encodeURIComponent("פנייה מהאתר") + "&body=" + encodeURIComponent(waText);
+          if (SITE.contact && SITE.contact.email) location.href = "mailto:" + SITE.contact.email + "?subject=" + encodeURIComponent("פנייה מהאתר FORMAL") + "&body=" + encodeURIComponent(mailText);
           return;
         }
         var btn = $("button[type=submit]", form); btn.disabled = true; var label = btn.textContent; btn.textContent = "שולח…";
@@ -400,7 +397,7 @@
           form.reset();
           showNote("תודה! ההודעה נשלחה אליי, ואחזור אלייך בהקדם.", false);
         } catch (err) {
-          showNote(err.message + (wa ? " אפשר גם לכתוב לי בוואטסאפ דרך הקישור בפרטים." : ""), true);
+          showNote(err.message + (SITE.contact && SITE.contact.email ? " אפשר גם לכתוב לי ישירות למייל שבפרטים." : ""), true);
         }
         btn.disabled = false; btn.textContent = label;
       });
