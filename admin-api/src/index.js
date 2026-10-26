@@ -19,6 +19,7 @@ const CONTENT_FILES = { site: "content/site.json", works: "content/works.json", 
 const MEDIA_DIR = "assets/media";
 const ALLOWED_EXT = ["jpg", "jpeg", "png", "webp", "gif", "svg", "mp4", "webm", "pdf"];
 const TOKEN_TTL = 7 * 24 * 3600;
+const PBKDF2_ITER = 100000;   // Cloudflare Workers allows at most 100,000 PBKDF2 iterations
 const MSG_TTL = 180 * 24 * 3600;
 
 export default {
@@ -123,11 +124,12 @@ async function rateLimit(env, key, max, ttl, message) {
 }
 
 /* ---------------- passwords & tokens ---------------- */
-async function hashPassword(password, saltB64) {
+async function hashPassword(password, saltB64, iter) {
+  const iterations = Math.min(Number(iter) || PBKDF2_ITER, PBKDF2_ITER);
   const salt = saltB64 ? b64decode(saltB64) : crypto.getRandomValues(new Uint8Array(16));
   const key = await crypto.subtle.importKey("raw", te.encode(password), "PBKDF2", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations: 120000 }, key, 256);
-  return { salt: b64encode(salt), hash: b64encode(new Uint8Array(bits)) };
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations }, key, 256);
+  return { salt: b64encode(salt), hash: b64encode(new Uint8Array(bits)), iter: iterations };
 }
 function timingSafeEqual(a, b) {
   if (a.length !== b.length) return false;
@@ -161,8 +163,8 @@ async function getAdmins(env) {
   if (!admins || !Object.keys(admins).length) {
     const email = normEmail(env.OWNER_EMAIL);
     if (!isEmail(email) || !env.OWNER_PASSWORD) throw httpError(500, "לא הוגדרו OWNER_EMAIL / OWNER_PASSWORD");
-    const { salt, hash } = await hashPassword(env.OWNER_PASSWORD);
-    admins = { [email]: { name: "בעלת האתר", role: "owner", salt, hash, created: new Date().toISOString() } };
+    const { salt, hash, iter } = await hashPassword(env.OWNER_PASSWORD);
+    admins = { [email]: { name: "בעלת האתר", role: "owner", salt, hash, iter, created: new Date().toISOString() } };
     await env.ADMIN_KV.put("admins", JSON.stringify(admins));
   }
   return admins;
@@ -195,7 +197,7 @@ async function login(request, env) {
   const a = admins[email];
   let ok = false;
   if (a) {
-    const { hash } = await hashPassword(password, a.salt);
+    const { hash } = await hashPassword(password, a.salt, a.iter);
     ok = timingSafeEqual(hash, a.hash);
   }
   if (!ok) {
@@ -251,8 +253,8 @@ async function resetPassword(request, env) {
   if (!rec) throw httpError(400, "קישור האיפוס פג תוקף או כבר נוצל. בקשי קישור חדש");
   const admins = await getAdmins(env);
   if (!admins[rec.email]) throw httpError(400, "המשתמש כבר לא קיים");
-  const { salt, hash } = await hashPassword(password);
-  admins[rec.email] = { ...admins[rec.email], salt, hash };
+  const { salt, hash, iter } = await hashPassword(password);
+  admins[rec.email] = { ...admins[rec.email], salt, hash, iter };
   await saveAdmins(env, admins);
   await env.ADMIN_KV.delete("reset:" + token);
   await env.ADMIN_KV.delete("fail:" + (request.headers.get("CF-Connecting-IP") || "unknown"));
@@ -273,8 +275,8 @@ async function addAdmin(request, env, actor) {
   if (password.length < 8) throw httpError(400, "סיסמה חייבת להכיל לפחות 8 תווים");
   const admins = await getAdmins(env);
   if (admins[email]) throw httpError(409, "המייל הזה כבר רשום");
-  const { salt, hash } = await hashPassword(password);
-  admins[email] = { name: name || email, role: "admin", salt, hash, created: new Date().toISOString() };
+  const { salt, hash, iter } = await hashPassword(password);
+  admins[email] = { name: name || email, role: "admin", salt, hash, iter, created: new Date().toISOString() };
   await saveAdmins(env, admins);
   return json({ admin: publicAdmin({ email, ...admins[email] }) }, 201);
 }
@@ -296,8 +298,8 @@ async function changePassword(request, env, actor) {
   if (target !== actor.email) requireOwner(actor);
   const admins = await getAdmins(env);
   if (!admins[target]) throw httpError(404, "לא נמצא");
-  const { salt, hash } = await hashPassword(password);
-  admins[target] = { ...admins[target], salt, hash };
+  const { salt, hash, iter } = await hashPassword(password);
+  admins[target] = { ...admins[target], salt, hash, iter };
   await saveAdmins(env, admins);
   return json({ ok: true });
 }

@@ -44,10 +44,10 @@ const c=require("crypto"); const [em,pw,cur]=process.argv.slice(1);
 let admins={}; try { const j=JSON.parse(cur); if (j && typeof j==="object" && !Array.isArray(j)) admins=j; } catch {}
 // ניקוי רשומות שנוצרו בטעות (מפתח שאינו כתובת מייל)
 for (const k of Object.keys(admins)) if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(k)) delete admins[k];
-const salt=c.randomBytes(16); const hash=c.pbkdf2Sync(pw,salt,120000,32,"sha256");
+const salt=c.randomBytes(16); const hash=c.pbkdf2Sync(pw,salt,100000,32,"sha256");   // Cloudflare: max 100,000
 const hasOwner=Object.values(admins).some(a=>a.role==="owner");
 const prev=admins[em]||{ name: hasOwner ? em : "בעלת האתר", role: hasOwner ? "admin" : "owner", created: new Date().toISOString() };
-admins[em]={...prev, salt:salt.toString("base64"), hash:hash.toString("base64")};
+admins[em]={...prev, salt:salt.toString("base64"), hash:hash.toString("base64"), iter:100000};
 process.stdout.write(JSON.stringify(admins));' "$EM" "$PW" "$CUR")"
 $W kv key put --binding ADMIN_KV --remote admins "$REC" >/dev/null || { echo "השמירה נכשלה"; exit 1; }
 echo "הסיסמה של $EM עודכנה ✓  כניסה: https://chana-c.github.io/formal/admin.html"
