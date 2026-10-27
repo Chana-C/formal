@@ -14,10 +14,12 @@
   var canvas = hero.querySelector(".hero__fog");
   var fog = null;
 
-  if (!reduce && canvas && window.FormalFog) {
+  if (canvas && window.FormalFog) {
     try { fog = window.FormalFog.init(canvas); } catch (e) { fog = null; }
   }
   if (!fog) hero.classList.add("no-webgl");
+  // reduced motion: show the lit smoke as a still frame instead of animating it
+  if (fog && reduce) { fog.set("intensity", 1); fog.set("red", 0.6); setTimeout(function () { fog.pause(); }, 1200); }
 
   var words = Array.prototype.slice.call(hero.querySelectorAll(".hero__word"));
   var action = hero.querySelector(".hero__word--action");
