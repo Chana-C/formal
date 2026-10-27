@@ -10,13 +10,15 @@ GH_OWNER = "Chana-C"
 GH_REPO = "formal"
 GH_BRANCH = "main"
 # מאיזה אתרים מותר לממשק הניהול לפנות ל-API (מופרד בפסיקים). localhost תמיד מותר.
-ALLOWED_ORIGINS = "https://chana-c.github.io"
+ALLOWED_ORIGINS = "https://formal-action.pages.dev,https://chana-c.github.io"
 # חתימת הקומיטים שנוצרים מהממשק (השם שלך, לא של כלי)
 COMMIT_NAME = "Chana-C"
 COMMIT_EMAIL = "142223141+Chana-C@users.noreply.github.com"
 MAX_UPLOAD_MB = "20"
 # כתובת דף הניהול – משמשת לקישורי איפוס סיסמה שנשלחים במייל
-ADMIN_URL = "https://chana-c.github.io/formal/admin.html"
+ADMIN_URL = "https://formal-action.pages.dev/admin.html"
+# הכתובת הראשית של האתר (Cloudflare Pages) – מוצגת בממשק הניהול
+SITE_URL = "https://formal-action.pages.dev/"
 
 [[kv_namespaces]]
 binding = "ADMIN_KV"

@@ -50,4 +50,4 @@ const prev=admins[em]||{ name: hasOwner ? em : "בעלת האתר", role: hasOwn
 admins[em]={...prev, salt:salt.toString("base64"), hash:hash.toString("base64"), iter:100000};
 process.stdout.write(JSON.stringify(admins));' "$EM" "$PW" "$CUR")"
 $W kv key put --binding ADMIN_KV --remote admins "$REC" >/dev/null || { echo "השמירה נכשלה"; exit 1; }
-echo "הסיסמה של $EM עודכנה ✓  כניסה: https://chana-c.github.io/formal/admin.html"
+echo "הסיסמה של $EM עודכנה ✓  כניסה: https://formal-action.pages.dev/admin.html"

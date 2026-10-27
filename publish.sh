@@ -46,7 +46,7 @@ else
 fi
 
 # 4) תמונת השיתוף (og:image) חייבת כתובת מלאה
-ABS="https://${LOGIN_LC}.github.io/${REPO}/assets/img/og.png"
+ABS="https://formal-action.pages.dev/assets/img/og.png"
 if grep -q 'property="og:image" content="assets/img/og.png"' index.html; then
   sed -i "s|property=\"og:image\" content=\"assets/img/og.png\"|property=\"og:image\" content=\"${ABS}\"|" index.html
   git add index.html && git commit -q -m "og:image absolute url"
@@ -68,6 +68,7 @@ gh api -X POST "repos/${LOGIN}/${REPO}/pages" -f "source[branch]=${BRANCH}" -f "
 echo
 echo "========================================="
 echo " הקוד:   https://github.com/${LOGIN}/${REPO}"
-echo " האתר:   https://${LOGIN_LC}.github.io/${REPO}/   (עולה לאוויר תוך 1-2 דקות)"
+echo " האתר:   https://formal-action.pages.dev/   (עולה לאוויר תוך 1-2 דקות)"
+echo " כתובת משנית: https://${LOGIN_LC}.github.io/${REPO}/"
 echo " עריכה:  https://github.com/${LOGIN}/${REPO}/edit/${BRANCH}/content/works.js"
 echo "========================================="

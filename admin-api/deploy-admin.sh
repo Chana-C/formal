@@ -108,6 +108,6 @@ git push -q origin "$(git branch --show-current)" || true
 echo
 echo "========================================="
 echo " Admin API:     $API_URL"
-echo " ממשק הניהול:  https://chana-c.github.io/formal/admin.html   (פעיל תוך 1-2 דקות)"
+echo " ממשק הניהול:  https://formal-action.pages.dev/admin.html   (פעיל תוך 1-2 דקות)"
 echo " כניסה עם המייל והסיסמה שהגדרת."
 echo "========================================="

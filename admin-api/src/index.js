@@ -9,7 +9,7 @@
    Secrets (wrangler secret put):  GITHUB_TOKEN, SESSION_SECRET, OWNER_EMAIL, OWNER_PASSWORD,
                                    WEB3FORMS_KEY (אופציונלי – שליחת פניות למייל)
    Vars (wrangler.toml):           GH_OWNER, GH_REPO, GH_BRANCH, ALLOWED_ORIGINS,
-                                   COMMIT_NAME, COMMIT_EMAIL, MAX_UPLOAD_MB
+                                   COMMIT_NAME, COMMIT_EMAIL, MAX_UPLOAD_MB, ADMIN_URL, SITE_URL
    KV binding:                     ADMIN_KV
    ========================================================= */
 
@@ -541,7 +541,7 @@ async function deleteMessage(env, id, actor) {
 async function pagesStatus(env) {
   try {
     const b = await gh(env, "/pages/builds/latest");
-    return json({ status: b.status, updated: b.updated_at, url: `https://${String(env.GH_OWNER).toLowerCase()}.github.io/${env.GH_REPO}/` });
+    return json({ status: b.status, updated: b.updated_at, url: env.SITE_URL || `https://${String(env.GH_OWNER).toLowerCase()}.github.io/${env.GH_REPO}/` });
   } catch (e) {
     return json({ status: "unknown", error: e.message });
   }

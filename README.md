@@ -4,8 +4,9 @@
 
 אתר סטטי, מהיר וקולנועי: שחור · אדום · לבן, רקע עשן וערפל ב-WebGL, פתיח "אחד · שתיים · שלוש · אקשן", גלריית עבודות עם נגן מובנה (בלי אפשרות הורדה), דף אודות, דף המלצות, טופס יצירת קשר שמגיע למייל של בעלת האתר בלבד, עמוד מדיניות פרטיות, ו**ממשק ניהול** עם כניסה במייל וסיסמה.
 
-- **האתר:** https://chana-c.github.io/formal/
-- **ממשק הניהול:** https://chana-c.github.io/formal/admin.html
+- **האתר:** https://formal-action.pages.dev/
+- **ממשק הניהול:** https://formal-action.pages.dev/admin.html
+- **כתובת משנית (GitHub Pages):** https://chana-c.github.io/formal/
 - **הקוד:** https://github.com/Chana-C/formal
 
 ## איך מעלים תוכן
@@ -127,10 +128,17 @@ cd ~/formal && bash preview-admin.sh
 bash publish.sh
 ```
 
+## הכתובת הראשית: Cloudflare Pages
+האתר מוגש מ-Cloudflare Pages (חינם) בכתובת https://formal-action.pages.dev/ ומתעדכן אוטומטית מכל שמירה בממשק הניהול או `git push` (כמו GitHub Pages, שממשיך לעבוד ככתובת משנית).
+
+הקמה חד-פעמית (בדפדפן): dash.cloudflare.com ← **Workers & Pages** ← **Create** ← **Pages** ← **Connect to Git** ← אישור GitHub ובחירת הריפו `Chana-C/formal` ← שם הפרויקט `formal-action` ← ענף `main` ← Framework preset: **None**, Build command ריק, Build output directory: `/` ← **Save and Deploy**.
+
+הקובץ `_headers` מוסיף כותרות אבטחה ב-Cloudflare Pages (GitHub Pages מתעלם ממנו).
+
 ## דומיין משלך (אופציונלי)
-ב-GitHub: **Settings → Pages → Custom domain**, ואצל ספק הדומיין רשומת `CNAME` ל-`chana-c.github.io`. HTTPS אוטומטי. אחרי זה מוסיפים את הדומיין החדש ל-`ALLOWED_ORIGINS` ב-`admin-api/wrangler.toml` ומריצים שוב את `deploy-admin.sh`.
+ב-Cloudflare Pages: **Custom domains → Set up a custom domain** (HTTPS אוטומטי; אם הדומיין נקנה דרך Cloudflare אין מה להגדיר ידנית). אחרי זה מוסיפים את הדומיין החדש ל-`ALLOWED_ORIGINS` ו-`SITE_URL`/`ADMIN_URL` ב-`admin-api/wrangler.toml` ומריצים שוב את `deploy-admin.sh`.
 
 ## טכנולוגיות
-HTML5 · CSS3 · JavaScript · WebGL/GLSL (ערפל) · GSAP 3 מאוחסן באתר (פתיח) · פונטים מאוחסנים באתר (Frank Ruhl Libre, Heebo, רישיון OFL) · GitHub Pages (אתר) · Cloudflare Workers + KV (ממשק ניהול, פניות) · Web3Forms (שליחת פניות למייל). בלי build, בלי מסד נתונים, בלי עלות.
+HTML5 · CSS3 · JavaScript · WebGL/GLSL (ערפל) · GSAP 3 מאוחסן באתר (פתיח) · פונטים מאוחסנים באתר (Frank Ruhl Libre, Heebo, רישיון OFL) · Cloudflare Pages + GitHub Pages (אתר) · Cloudflare Workers + KV (ממשק ניהול, פניות) · Web3Forms (שליחת פניות למייל). בלי build, בלי מסד נתונים, בלי עלות.
 
 </div>
